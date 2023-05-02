@@ -1,0 +1,94 @@
+Group DMB
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Faturamento
+      FoldersCount=6
+      Folder Relatorios
+         VSSPath=Fontes
+         FilesCount=3
+         File \TOTVS 11\Microsiga\Protheus\Projetos\AFATR01.prw
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Projetos\DFATR01.PRW
+             Type=T
+         End
+         File \Protheus11\Projetos\DFATR02.PRW
+             Type=T
+         End
+      End
+      Folder Nfes
+         VSSPath=Definições
+         FilesCount=4
+         File \TOTVS 11\Microsiga\Protheus\Projetos\NFSEXml001.prw
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Projetos\NFSEXml002.prw
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Projetos\NFSEXml102.PRW
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Projetos\NFSEXml003.PRW
+             Type=T
+         End
+      End
+      Folder Processos
+         VSSPath=Nova Pasta3
+         FilesCount=3
+         File \TOTVS 11\Microsiga\Protheus\Projetos\AFATP01.prw
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Projetos\AFATR02.PRW
+             Type=T
+         End
+         File \Protheus11\Projetos\DFATP01.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta4
+         FilesCount=1
+         File \TOTVS 11\Microsiga\Protheus\Projetos\Ponto de Entrada\MA415MNU.prw
+             Type=T
+         End
+      End
+      Folder NFe
+         VSSPath=Nova Pasta5
+         FilesCount=3
+         File \TOTVS 11\Microsiga\Protheus\Protheus_Data\PROJETOS\nfesefaz.prw
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Protheus_Data\PROJETOS\danfeii.prw
+             Type=T
+         End
+         File \TOTVS 11\Microsiga\Protheus\Protheus_Data\PROJETOS\danfeiii.prw
+             Type=T
+         End
+      End
+      Folder NFE 1401
+         VSSPath=Nova Pasta6
+         FilesCount=3
+         File \Protheus11\Projetos\NFE 140114\danfeii.prw
+             Type=T
+         End
+         File \Protheus11\Projetos\NFE 140114\danfeiii.prw
+             Type=T
+         End
+         File \Protheus11\Projetos\NFE 140114\nfesefaz.prw
+             Type=T
+         End
+      End
+   End
+   BatchBuild_Item0=Faturamento · Oficial
+End

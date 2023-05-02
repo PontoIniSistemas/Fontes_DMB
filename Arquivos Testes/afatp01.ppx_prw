@@ -1,0 +1,203 @@
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\rwmake.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\stdwin.ch"
+#line 14 "rwmake.ch"
+#line 2 "\\servidortotvs\d\PROTHE~1\projetos\afatp01.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\topconn.ch"
+#line 3 "\\servidortotvs\d\PROTHE~1\projetos\afatp01.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\ap5mail.ch"
+#line 4 "\\servidortotvs\d\PROTHE~1\projetos\afatp01.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\MSOLE.CH"
+#line 5 "\\servidortotvs\d\PROTHE~1\projetos\afatp01.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Dialog.ch"
+#line 28 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Font.ch"
+#line 29 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\PTMenu.ch"
+#line 31 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Print.ch"
+#line 33 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Colors.ch"
+#line 35 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Folder.ch"
+#line 37 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\msobject.ch"
+#line 38 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\VKey.ch"
+#line 42 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\WinApi.ch"
+#line 44 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\FWCommand.ch"
+#line 47 "PROTHEUS.CH"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\FWCSS.CH"
+#line 50 "PROTHEUS.CH"
+#line 8 "\\servidortotvs\d\PROTHE~1\projetos\afatp01.prw"
+
+
+
+
+
+
+
+
+
+
+Function U_AFATP01()
+Private oNum
+Private cNum := Space(6)
+Private oGroup1
+Private oSay1
+Private oButton1
+Private oButton2
+
+Static oDlg
+
+  oDlg = MsDialog():New( 000, 000, 150, 320, "Orçamento",,,.F.,, 0, 16777215,,,.T.,, ,.F. )
+
+     oGroup1 := TGroup():New( 008, 007, 066, 150, "Orçamento", oDlg, 0, 16777215,.T., )
+     oNum := TGet():New( 024, 080, { | u | If( PCount() == 0, cNum, cNum := u ) },oDlg, 039, 010,,, 0, 16777215,,.F.,,.T.,,.F.,,.F.,.F.,,.F.,.F. ,"SCJ","cNum",,,, )
+     oButton1 := TButton():New( 045, 112, "Ok", oDlg,{||  fWord(cNum)}, 028, 011,,,.F.,.T.,.F.,,.F.,,,.F. )
+     oButton2 := TButton():New( 045, 081, "Cancela", oDlg,{||  oDlg:End()}, 028, 011,,,.F.,.T.,.F.,,.F.,,,.F. )
+     oSay1 := TSay():New( 028, 016,{||  "Selecione o Orçamento:"},oDlg,,,.F.,.F.,.F.,.T., 0, 16777215, 063, 007,.F.,.F.,.F.,.F.,.F.,.F. )
+
+  oDlg:Activate( oDlg:bLClicked, oDlg:bMoved, oDlg:bPainted,.T.,,,, oDlg:bRClicked, )
+
+Return
+
+Static Function fWord(cNum)
+Local cType    := "ORCAMENTO       | *.DOT"
+Local cArquivo := ""
+Local waItem	:= {}
+Local waQuant	:= {}
+Local waUn		:= {}
+Local waDesc	:= {}
+Local waVlUnit	:= {}
+Local waTot		:= {}
+Local waEntrega	:= {}
+
+
+
+
+
+
+cArquivo := "\Orcamento\Orcamento.dot"
+
+nPos := Rat("\",cArquivo)
+If nPos > 0
+	cArqLoc := AllTrim(Subst(cArquivo, nPos+1,20 ))
+Else
+	cArqLoc := cArquivo
+EndIF
+
+cPath := GETTEMPPATH()
+If Right( AllTrim(cPath), 1 ) <> "\"
+	cPath += "\"
+Endif
+
+If !CpyS2T(cArquivo, cPath, .T. )
+	Iif(FindFunction("APMsgStop"), APMsgStop("Nao foi possivel ler o arquivo de origem "+cArqLoc,), MsgStop("Nao foi possivel ler o arquivo de origem "+cArqLoc,))
+
+	Return
+Endif
+
+dbSelectArea("SCJ")
+dbSetOrder(1)
+If dbSeek(xFilial("SCJ")+AllTrim(cNum))
+
+
+	oWord := OLE_CreateLink("TMsOleWord97")
+
+	OLE_NewFile(oWord,cPath+cArqLoc)
+
+	OLE_SetProperty( oWord, "206", .T.  )
+	OLE_SetProperty( oWord, "208", .F.  )
+
+
+	cData := AllTrim(STR(DAY(DATE()))) + " de " + MesExtenso(DATE()) +  ",  " + AllTrim(STR(YEAR(DATE())))
+	OLE_SetDocumentVar(oWord,"cData",			cData)
+	OLE_SetDocumentVar(oWord,"cCodCli",			SCJ->CJ_CLIENTE)
+	OLE_SetDocumentVar(oWord,"cCotCli",			SCJ->CJ_COTCLI)
+	OLE_SetDocumentVar(oWord,"cCondPag",		Posicione("SE4",1,xFilial("SE4")+SCJ->CJ_CONDPAG,"E4_DESCRI"))
+
+	OLE_SetDocumentVar(oWord,"cObs",			SCJ->CJ_OBS)
+
+	OLE_SetDocumentVar(oWord,"cVendInt",		SCJ->CJ_USUARIO)
+	OLE_SetDocumentVar(oWord,"cVendExt",		Posicione("SA3",1,xFilial("SA3")+SCJ->CJ_VEND,"A3_NOME"))
+
+
+
+	dbSelectArea("SA1")
+	dbSetOrder(1)
+	If dbSeek(xFilial("SA1")+SCJ->CJ_CLIENTE)
+		OLE_SetDocumentVar(oWord,"cCliente",	SA1->A1_NOME)
+		OLE_SetDocumentVar(oWord,"cEndereco",	SA1->A1_END)
+		OLE_SetDocumentVar(oWord,"cBairro",		SA1->A1_BAIRRO)
+		OLE_SetDocumentVar(oWord,"cCidade",		SA1->A1_MUN)
+		OLE_SetDocumentVar(oWord,"cUF",			SA1->A1_EST)
+		OLE_SetDocumentVar(oWord,"cNomeCont",	SA1->A1_CONTATO)
+		OLE_SetDocumentVar(oWord,"cEmailCont",	SA1->A1_EMAIL)
+		OLE_SetDocumentVar(oWord,"cTelCont",	SA1->A1_TEL)
+		OLE_SetDocumentVar(oWord,"cFaxCont",	SA1->A1_FAX)
+	EndIf
+	dbCloseArea("SA1")
+
+
+	dbSelectArea("SCK")
+	dbSetOrder(1)
+	If dbSeek(xFilial("SCK")+SCJ->CJ_NUM)
+
+		While !Eof() .AND.  SCK->CK_NUM == SCJ->CJ_NUM
+			aAdd(waItem,SCK->CK_ITEM)
+			aAdd(waQuant,SCK->CK_QTDVEN)
+			aAdd(waUn,SCK->CK_UM)
+			aAdd(waDesc,SCK->CK_DESCRI)
+			aAdd(waVlUnit,SCK->CK_PRCVEN)
+			aAdd(waTot,SCK->CK_VALOR)
+			aAdd(waEntrega,DTOC(SCK->CK_ENTREG))
+			dbSelectArea("SCK")
+			dbSkip()
+		EndDo
+
+	EndIf
+
+	OLE_SetDocumentVar(oWord,"prc_nroitens",str(Len(waQuant)))
+
+
+	for nK := 1 to Len(waQuant)
+		OLE_SetDocumentVar(oWord,"Prc_item"+AllTrim(Str(nK)),waItem[nK])
+		OLE_SetDocumentVar(oWord,"Prc_quant"+AllTrim(Str(nK)),waQuant[nK])
+		OLE_SetDocumentVar(oWord,"Prc_un"+AllTrim(Str(nK)),waUn[nK])
+		OLE_SetDocumentVar(oWord,"Prc_desc"+AllTrim(Str(nK)),waDesc[nK])
+		OLE_SetDocumentVar(oWord,"Prc_vlrunit"+AllTrim(Str(nK)),Transform(waVlUnit[nK],"@E 999.999.99"))
+		OLE_SetDocumentVar(oWord,"Prc_tot"+AllTrim(Str(nK)),Transform(waTot[nK],"@E 999,999,999.99"))
+		OLE_SetDocumentVar(oWord,"Prc_entrega"+AllTrim(Str(nK)),waEntrega[nK])
+	next
+
+	OLE_ExecuteMacro(oWord,"TabItens")
+
+
+	OLE_UpDateFields(oWord)
+
+	cArquivo:= SCJ->CJ_NUM+".DOT"
+
+
+
+	APMsgInfo("Alterne para o programa do Ms-Word " + Chr(13) + Chr(10) + "para visualizar o documento " + cArquivo + Chr(13) + Chr(10) + "Salve, porem NÃO feche o word. Depois confirme esta mensagem...")
+
+	OLE_SaveAsFile( oWord, cArquivo )
+	OLE_CloseLink( oWord )
+
+	If File(cPath+cArqLoc)
+		FErase(cPath+cArqLoc)
+	Endif
+
+Else
+	APMsgAlert("Codigo de orçamento invalido!")
+	cNum := ""
+EndIf
+
+dbCloseArea("SCJ")
+
+oDlg:End()
+
+Return

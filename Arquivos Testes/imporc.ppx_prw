@@ -1,0 +1,241 @@
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Dialog.ch"
+#line 28 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Font.ch"
+#line 29 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\PTMenu.ch"
+#line 31 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Print.ch"
+#line 33 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Colors.ch"
+#line 35 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Folder.ch"
+#line 37 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\msobject.ch"
+#line 38 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\VKey.ch"
+#line 42 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\WinApi.ch"
+#line 44 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\FWCommand.ch"
+#line 47 "Protheus.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\FWCSS.CH"
+#line 50 "Protheus.ch"
+#line 2 "\\servidortotvs\d\PROTHE~1\projetos\imporc.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Topconn.ch"
+#line 3 "\\servidortotvs\d\PROTHE~1\projetos\imporc.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\Rwmake.ch"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\stdwin.ch"
+#line 14 "Rwmake.ch"
+#line 4 "\\servidortotvs\d\PROTHE~1\projetos\imporc.prw"
+#line 1 "\\192.168.0.122\D\PROTHE~1\INCLUDE\MSOLE.CH"
+#line 21 "\\servidortotvs\d\PROTHE~1\projetos\imporc.prw"
+Function U_IMPORC()
+
+Local oDlg    := NIL
+
+
+
+
+
+oDlg := MSDialog():New(096, 042, 323, 505, OemToAnsi("Impressao de Orcamento"),,,,,,,,, .t. ,,,)
+ TGroup():New(008,010,084,222,OemToAnsi(),, , , .t. )
+ IW_Say(018,020,"Impressao do Orçamento via Documento do WORD.",,,,, )
+ IW_Say(030,020,"Será impresso de acordo com a selecao de parametros.",,,,, )
+ TButton():New( 095, 130, OemToAnsi(StrTran("Imprimir", "_", "&")) , ,{|Self|Processa({||IMPORCII()},"Processando...")}, 45, 10,,,, .t. )
+
+
+cCBX := "Opção 2"
+aCBX := {"Opção 1","Opção 2","Opção 3","Opção 4","Opção 5","Opção 6","Opção 7","Opção ..."}
+
+ TComboBox():New(57,77,{ |x| If(x<>nil,cCBX := x,nil) , cCBX },aCBX,64,21,, , , , , , .t. )
+Activate Dialog
+Return
+
+ SButton():New(095, 187, 2,{|| oDlg:End()},,)
+
+oDlg:Activate(,,,.T.,, ,)
+
+Return Nil
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Static Function IMPORCII()
+
+Local _nVez    := 0
+Local _nTotal  := 0
+Local _aCodpro := {}
+Local _aDesc   := {}
+Local _aItem   := {}
+Local _aQtd    := {}
+Local _aNCM    := {}
+Local _aPreco  := {}
+Local _aEntr   := {}
+Local _aICMs   := {}
+Local _aIpi    := {}
+Local cFileSave  := ""
+Private cString  := ""
+Private hWord
+Private cPathDot :="\\192.168.0.122\d\Protheus11\Protheus_Data_teste\Orcamento\asstec.dot"
+
+AjustaSX1("IMPORC")
+Pergunte("IMPORC", .T.  )
+
+
+
+
+
+If !File(cPathDot)
+	IW_MsgBox("Arquivo asstec.dot nao encontrado.","ERRO","STOP")
+	Return( .F. )
+Endif
+
+
+
+
+
+SCJ->( DbSetOrder(1) )
+SA1->( DbSetOrder(1) )
+SE4->( DbSetOrder(1) )
+SCK->( DbSetOrder(1) )
+SB1->( DbSetOrder(1) )
+
+
+
+
+
+    If! SCJ->( DbSeek(XFILIAL("SCJ")+mv_par01) )
+    	apMsgStop("Orcamento não encontrado!")
+		Return
+	EndIf
+
+
+
+
+
+    SA1->( DbSeek(XFILIAL("SA1")+SCJ->CJ_CLIENTE+SCJ->CJ_LOJA) )
+    SE4->( DbSeek(XFILIAL("SE4")+SCJ->CJ_CONDPAG) )
+   	SCK->( DbSeek(XFILIAL("SCK")+mv_par01) )
+
+	While !SCK->(Eof()) .and.  SCK->CK_NUM = mv_par01
+		If SB1->( DbSeek(XFILIAL("SB1")+SCK->CK_PRODUTO) )
+			AADD(_aItem , SCK->CK_ITEM)
+			AADD(_aCodPro , SCK->CK_PRODUTO)
+			AADD(_aDesc , SB1->B1_DESC)
+			AADD(_aQtd , SCK->CK_QTDVEN)
+			AADD(_aPreco , SCK->CK_PRCVEN)
+			AADD(_aIpi , SB1->B1_IPI)
+			AADD(_aICMS, SB1->B1_PICM)
+			AADD(_aEntr ,SCK->CK_ENTREG)
+			AADD(_aNCM  ,SB1->B1_POSIPI)
+			_nTotal = _nTotal + SCK->CK_VALOR
+		EndIf
+		_nVez++
+		SCK->( dbSkip() )
+	End
+
+    hWord    := OLE_CreateLink()
+	OLE_NewFile(hWord, cPathDot )
+
+    	OLE_SetDocumentVar(hWord, "_cjNum"    , SCJ->CJ_NUM)
+ 		OLE_SetDocumentVar(hWord, "_cjEmissao"   , SCJ->CJ_EMISSAO)
+ 		OLE_SetDocumentVar(hWord, "_cjVend"   , alltrim(SCJ->CJ_NVEND) )
+ 		OLE_SetDocumentVar(hWord, "_cjMaquina" , alltrim(SCJ->CJ_XEQPTO) )
+ 		OLE_SetDocumentVar(hWord, "_cjValidade"   , SCJ->CJ_VALIDA)
+    	OLE_SetDocumentVar(hWord, "_cjDepto"    ,    alltrim(SCJ->CJ_XDEPTO) )
+ 		OLE_SetDocumentVar(hWord, "_cjFone"     , SCJ->CJ_XDDD+"-"+SCJ->CJ_XFONE)
+ 		OLE_SetDocumentVar(hWord, "_cjEmail"      , SCJ->CJ_XEMAIL)
+ 		OLE_SetDocumentVar(hWord, "_cjObs"  , UPPER(SCJ->CJ_XOBS))
+ 		OLE_SetDocumentVar(hWord, "_cjFrete" , SCJ->CJ_TIPFRET)
+		OLE_SetDocumentVar(hWord, "_cjEmpresa"     , alltrim(SA1->A1_NOME) )
+ 		OLE_SetDocumentVar(hWord, "_cjCNPJ"    , transform(SA1->A1_CGC,"@R 99.999.999/9999-99") )
+
+		OLE_SetDocumentVar(hWord, "_cjPgto" , SE4->E4_DESCRI)
+		OLE_SetDocumentVar(hWord, "_ckTotal", transform(_nTotal, "@E 99,999,999,999.99") )
+
+	For i:=1 to _nVez
+
+
+
+
+
+
+		OLE_SetDocumentVar(hWord, "Prt_nroitens",_nVez)
+
+
+
+
+
+
+ 		OLE_SetDocumentVar(hWord, "_ckItem"+AllTrim(Str(i)) , _aItem[i] )
+ 		OLE_SetDocumentVar(hWord, "_ckProd"+AllTrim(Str(i)) , transform(_aCodPro[i], "@R XXX-XXX-XXX-XXX-XXX" ) )
+ 		OLE_SetDocumentVar(hWord, "_ckDesc"+AllTrim(Str(i)) , alltrim(_aDesc[i]) )
+ 		OLE_SetDocumentVar(hWord, "_ckQtde"+AllTrim(Str(i)) , alltrim(transform(_aQtd[i], "@E 99,999,999,999.99" ) ) )
+ 		OLE_SetDocumentVar(hWord, "_ckVal"+AllTrim(Str(i))  , alltrim(transform(_aPreco[i], "@E 99,999,999,999.99" ) ) )
+		OLE_SetDocumentVar(hWord, "_ckEnt"+AllTrim(Str(i))  , _aEntr[i] )
+		OLE_SetDocumentVar(hWord, "_ckIpi"+AllTrim(Str(i))  , _aIpi[i] )
+ 		OLE_SetDocumentVar(hWord, "_ckIcm"+AllTrim(Str(i))  , _aICMS[i] )
+ 		OLE_SetDocumentVar(hWord, "_ckNcm"+AllTrim(Str(i))  , _aNCM[i] )
+
+        OLE_ExecuteMacro(hWord,"tabitens")
+    Next
+
+	OLE_UpdateFields(hWord)
+
+
+
+
+
+	cFileSave := "c:\orcamento\"
+	OLE_SaveAsFile( hWord, cFileSave+"Proposta_"+SCJ->CJ_NUM+".doc" )
+	Iif(FindFunction("APMsgInfo"), APMsgInfo("O documento foi salvo em C:\orcamento", "Atenção"), MsgInfo("O documento foi salvo em C:\orcamento", "Atenção"))
+
+
+
+
+
+ 	OLE_CloseFile( hWord )
+ 	OLE_CloseLink( hWord )
+
+Return nil
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Static Function AjustaSX1(cPerg)
+
+Local aAreaAtu	:= GetArea()
+Local aAreaSX1	:= SX1->( GetArea() )
+
+PutSx1(	cPerg, "01", "Orçamento de Venda ? ", "" , "","mv_ch1","C"                     ,TAMSX3("CJ_NUM")[1]  ,                       0 , 2,"G","",   "SCJ","","","mv_par01","","","","","","","","","","","","","","","","",{"Informe o numero do orçamento para impressao",""},{""},{""},"")
+
+RestArea( aAreaSX1 )
+RestArea( aAreaAtu )
+
+Return()

@@ -1,0 +1,2098 @@
+#INCLUDE "TBICODE.CH"
+#INCLUDE "AP5MAIL.CH"
+#INCLUDE "PROTHEUS.CH"
+#INCLUDE "FONT.CH"
+#include "TOPCONN.CH"
+#INCLUDE "TBICONN.CH"
+#INCLUDE "COLORS.CH"
+#INCLUDE "RPTDEF.CH"
+#INCLUDE "FWPRINTSETUP.CH"
+
+User Function pprop01()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de Variaveis                                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+LOCAL oDlg := NIL
+LOCAL cString	:= "SCJ"
+PRIVATE titulo 	:= ""
+PRIVATE nLastKey:= 0
+PRIVATE nomeProg:= FunName()
+Private nTotal	:= 0
+Private nSubTot	:= 0
+
+xorc := space(6)
+
+cCadastro := OemToAnsi("Impressão de Orcamentos")
+
+aRotina := {{ OemToAnsi("Pesquisar"),"AxPesqui" , 0, 1},; 	
+            { OemToAnsi("Gerar"),"U_gerar" , 0, 2}}             
+
+dbSelectArea("SCJ")
+mBrowse( 6,1,22,75,"SCJ",,,,)
+RETURN
+         
+*************************************************************
+
+User Function gerar()
+
+wnrel := FunName()            //Nome Default do relatorio em Disco
+
+PRIVATE cTitulo := "Impressão da proposta de vendas"
+PRIVATE oPrn    := NIL
+PRIVATE oFont1  := NIL
+PRIVATE oFont2  := NIL
+PRIVATE oFont3  := NIL
+PRIVATE oFont4  := NIL
+PRIVATE oFont5  := NIL
+PRIVATE oFont6  := NIL
+Private nLastKey := 0
+Private nLin := 1650
+Private oDlg := NIL
+Private ctitulo := "Impressão do Orcamento"
+Private xproduto := {}
+Private xcontruc := {}
+Private xescop1  := {}
+Private xoperac  := {}
+Private xcurva   := {}
+Private xdimen   := {}
+Private xtotal   := 0
+Private xtipi    := 0
+patimgprd := getmv("mv_imgprd")
+
+DEFINE FONT oFont1 NAME "Arial" SIZE 0,20 BOLD  OF oPrn
+DEFINE FONT oFont2 NAME "Arial" SIZE 0,14 BOLD OF oPrn
+DEFINE FONT oFont3 NAME "Arial" SIZE 0,14 OF oPrn
+DEFINE FONT oFont4 NAME "Arial" SIZE 0,14 ITALIC OF oPrn
+DEFINE FONT oFont5 NAME "Arial" SIZE 0,14 OF oPrn
+DEFINE FONT oFont6 NAME "Arial" BOLD
+
+oFont08	 := TFont():New("Arial",08,08,,.F.,,,,.T.,.F.)
+oFont08N := TFont():New("Arial",08,08,,.T.,,,,.T.,.F.)
+oFont10	 := TFont():New("Arial",10,10,,.F.,,,,.T.,.F.)
+oFont10N := TFont():New("Arial",10,10,,.T.,,,,.T.,.F.)
+oFont12  := TFont():New("Arial",10,10,,.F.,,,,.T.,.F.)
+oFont12N := TFont():New("Arial",12,12,,.T.,,,,.T.,.F.)
+oFont13  := TFont():New("Arial",13,13,,.F.,,,,.T.,.F.)
+oFont13N := TFont():New("Arial",13,13,,.T.,,,,.T.,.F.)
+oFont14	 := TFont():New("Arial",14,14,,.F.,,,,.T.,.F.)
+oFont14N := TFont():New("Arial",14,14,,.T.,,,,.T.,.F.)
+oFont16	 := TFont():New("Arial",16,16,,.F.,,,,.T.,.F.)
+oFont16N := TFont():New("Arial",16,16,,.T.,,,,.T.,.F.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Tela de Entrada de Dados - Parametros                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+nLastKey  := IIf(LastKey() == 27,27,nLastKey)
+
+If nLastKey == 27
+	Return
+Endif
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicio do lay-out / impressao                                ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+oPrn := TMSPrinter():New(cTitulo)
+
+oPrn:Setup()
+oPrn:SetPortrait()
+//oPrn:SetLandsCape()//SetPortrait() //SetLansCape()
+
+dbSelectArea("SCJ")
+xnum     := scj->cj_num
+xcondpg  := scj->cj_condpag
+xprazent := scj->cj_prazent
+xtpfrete := scj->cj_tpfrete
+xtpfrete := iif(scj->cj_tpfrete='F','FOB - Frete por conta do cliente (Informar transportadora)',iif(scj->cj_tpfrete='C','CIF - Frete por conta da Fabricadora de Bombas','DDP - Responsabilidade ate o local de desembarque no pais destino, informado pelo cliente'))
+xest     := scj->cj_est
+xcli     := scj->cj_cliente
+xncli    := scj->cj_nomcli
+xcontato := scj->cj_contato
+xdepto   := scj->cj_depto
+xemail   := scj->cj_email
+xtel     := scj->cj_tel
+xddd     := scj->cj_ddd
+xrefer   := scj->cj_projeto
+xvend1   := scj->cj_vend1
+xvend2   := scj->cj_vend2
+xvend2   := iif(xvend1 = xvend2,space(6),xvend2)
+
+xdesvio  := scj->cj_desvio
+xindice  := scj->cj_indice
+xobsgera := subs(scj->cj_obsgera,1,70)  
+
+dbSelectArea("SCK")
+dbSetOrder(01)
+dbSeek(xFilial("SCK")+XNUM)
+
+xpicm := sck->ck_picm
+if xest $ "MG RJ RS PR SC SP"
+   xbaser := 73+(34/100)
+else   
+   xbaser := 73+(43/100)
+endif      
+
+Do while sck->ck_num = xnum
+              
+   xescopo := sck->ck_escopo
+   xitem   := sck->ck_item
+   xqtd    := sck->ck_qtdven
+   xdescri := sck->ck_descri
+   xprcven := sck->ck_prcven
+  xpercipi := sck->ck_percipi
+   xvalor  := sck->ck_valor       
+   xsobres := sck->ck_sobres
+   xcronog := sck->ck_cronog
+   
+   xcarcaca  := sck->ck_carcaca
+   xtampa    := sck->ck_tampa
+   xengren   := sck->ck_engren
+   xmancal   := sck->ck_mancal
+   xvdeixo   := sck->ck_vdeixo
+   xsrotac   := sck->ck_srotac
+   xfluxo    := sck->ck_fluxo
+   xcor      := sck->ck_cor
+   xeixo     := sck->ck_eixo
+   xrotor    := sck->ck_rotor
+   
+   xfluido   := sck->ck_fluido
+   xtemper   := iif(sck->ck_temper <> 0,ltrim(str(sck->ck_temper)),'N.I.')    
+   xunitemp  := iif(sck->ck_temper <> 0,sck->ck_unitemp,'')
+   xdensid   := iif(sck->ck_densid <> 0,ltrim(str(sck->ck_densid)),'N.I.')
+   xundensi  := iif(sck->ck_densid <> 0,sck->ck_undensi,'')
+   xviscos   := iif(sck->ck_viscos <> 0,ltrim(str(sck->ck_viscos)),'N.I.')
+   xunivisc  := iif(sck->ck_viscos <> 0,sck->ck_univisc,'')
+   xvasp     := iif(sck->ck_vasp <> 0,ltrim(str(sck->ck_vasp)),'N.I.')
+   xunvasp   := iif(sck->ck_vasp <> 0,sck->ck_unvasp,'')
+   xvasn     := iif(sck->ck_vasn <> 0,ltrim(str(sck->ck_vasn)),'N.I.')
+   xunvazn   := iif(sck->ck_vasn <> 0,sck->ck_unvazn,'')
+   xpm       := iif(sck->ck_pm <> 0,ltrim(str(sck->ck_pm)),'N.I.')       
+   xpd       := iif(sck->ck_pd <> 0,ltrim(str(sck->ck_pd)),'N.I.')
+   xnpsh     := iif(sck->ck_npsh <> 0,ltrim(str(sck->ck_npsh)),'N.I.')
+   xrotacao  := iif(ck_rotacao <> 0,ltrim(str(sck->ck_rotacao)),'N.I.')
+   xpotcon   := iif(sck->ck_potcon <> 0,ltrim(str(sck->ck_potcon)),'N.I.')
+   xtensao   := sck->ck_tensao
+   
+   xsuc      := iif(sck->ck_suc <> 0,ltrim(str(sck->ck_suc)),'N.I.')
+   xunsuc    := sck->ck_unsuc
+   xrec      := iif(sck->ck_rec <> 0,ltrim(str(sck->ck_rec)),'N.I.')
+   xunrec    := sck->ck_unrec
+   xbocais   := sck->ck_bocais
+   
+   xbomba    := sck->ck_bomba
+   xtamanho  := sck->ck_tamanho
+   xframe    := sck->ck_frame
+   xtipob    := iif(sck->ck_tipob='EI','Engrenagem interna',iif(sck->ck_tipob='EE','Engrenagem Externa',iif(sck->ck_tipob='CI','Centrifuga Industrial',iif(sck->ck_tipob='CP','Centrifuga Petrobras','Importado'))))
+
+   xncurva   := sck->ck_ncurva
+   xcurva1   := sck->ck_curva1
+   xcurva2   := sck->ck_curva2
+   xcurva3   := sck->ck_curva3
+   xcurva4   := sck->ck_curva4      
+
+   ycurva1   := iif(empty(xcurva1),'','C1'+xnum+xitem+'.bmp')
+   ycurva2   := iif(empty(xcurva2),'','C2'+xnum+xitem+'.bmp')
+   ycurva3   := iif(empty(xcurva3),'','C3'+xnum+xitem+'.bmp')
+   ycurva4   := iif(empty(xcurva4),'','C4'+xnum+xitem+'.bmp')  
+   
+   xdiamrot  := sck->ck_diamrot
+   xabertur  := ltrim(str(sck->ck_abertur))
+
+   ximgprd   := iif(empty(sck->ck_imgprd),'','p'+xnum+xitem+'.bmp')
+   xtag := sck->ck_tag                                
+           
+   aadd(xproduto,{xitem,xqtd,xdescri,xprcven,xvalor,xpercipi})	        
+   
+   aadd(xcontruc,{xtipob,xcarcaca,xtampa,xengren,xmancal,xvdeixo,xbocais,xsrotac,xfluxo,xcor,xescopo,xeixo,xrotor,xsobres,xcronog,})
+   aadd(xoperac,{xfluido,xtemper,xunitemp,xdensid,xundensi,xviscos,xunivisc,xvasp,xunvasp,xvasn,xunvazn,xpm,xpd,xnpsh,xrotacao,xpotcon,xtensao,ximgprd,})
+   aadd(xcurva,{xncurva,xdiamrot,xabertur,xsuc,xunsuc,xrec,xunrec,ycurva1,ycurva2,ycurva3,ycurva4,xrotacao})
+                      
+   dbSelectArea("SZM")
+   dbSetOrder(01) 
+   dbSeek(xFilial("SZM")+xbomba+xtamanho+xframe)
+
+   if found()
+   
+      xtipob  := szm->zm_tipo
+      xpeso   := szm->zm_peso
+      xsuc    := szm->zm_suc      
+      xrec    := szm->zm_rec
+      xdia    := szm->zm_dia
+      xdib    := szm->zm_dib
+      xdic    := szm->zm_dic
+      xdid    := szm->zm_did
+      xdie    := szm->zm_die
+      xdif    := szm->zm_dif
+      xdig    := szm->zm_dig
+      xdih1   := szm->zm_dih1
+      xdih2   := szm->zm_dih2
+      xdih3   := szm->zm_dih3
+      xdih4   := szm->zm_dih4
+      xdil    := szm->zm_dil
+      xdim    := szm->zm_dim
+      xdin    := szm->zm_din
+      xdix    := szm->zm_dix
+      xvoluta := szm->zm_voluta
+      xbase   := szm->zm_base
+      xpbase  := szm->zm_pbase  
+      ximagem := szm->zm_imagem  
+      
+      xsfx    := szm->zm_sfx 
+      xsfy    := szm->zm_sfy
+      xsfz    := szm->zm_sfz             
+      xsmx    := szm->zm_smx 
+      xsmy    := szm->zm_smy
+      xsmz    := szm->zm_smz
+      
+      xrfx    := szm->zm_rfx 
+      xrfy    := szm->zm_rfy
+      xrfz    := szm->zm_rfz             
+      xrmx    := szm->zm_rmx 
+      xrmy    := szm->zm_rmy
+      xrmz    := szm->zm_rmz      
+
+//                    1       2       3     4    5    6      7     8    9    10   11   12   13   14   15    16    17    18    19   20   21   22    23      24    25    36   27   28   29   30   31   32   33   34   35   36   37   38    39
+      aadd(xdimen,{xbomba,xtamanho,xframe,xpeso,xsuc,xrec,ximagem,xdia,xdib,xdic,xdid,xdie,xdif,xdig,xdih1,xdih2,xdih3,xdih4,xdil,xdim,xdin,xdix,xvoluta,xbase,xpbase,xsfx,xsfy,xsfz,xsmx,xsmy,xsmz,xrfx,xrfy,xrfz,xrmx,xrmy,xrmz,xtag,xtipob})
+
+   endif    
+
+   dbSelectArea("SCK")
+   dbskip()                
+enddo   
+
+dbSelectArea("SE4")
+dbSetOrder(01)
+dbSeek(xFilial("SE4")+xcondpg)
+if found()
+   ncondpg := se4->e4_descri
+else
+   ncondpg := ""
+endif
+
+dbSelectArea("SA3")
+dbSetOrder(01)
+dbSeek( xFilial("SA3")+xvend1)
+if found()
+   nvend1  := rtrim(sa3->a3_nome)  // nome do vendedor
+   cvend1  := rtrim(sa3->a3_mens1) // cargo do vendedor
+   evend1  := rtrim(sa3->a3_mens2) // empresa do vendedor
+   tvend1  := rtrim(sa3->a3_tel)
+   fvend1  := rtrim(sa3->a3_fax)
+   emvend1 := rtrim(sa3->a3_email)
+   svend1  := rtrim(sa3->a3_hpage)
+   
+   x1 := len(nvend1)
+   x2 := len(cvend1)
+   x3 := len(evend1)
+   x4 := len(tvend1)
+   x5 := len(fvend1)
+   x6 := len(emvend1)            
+   x7 := len(svend1)
+      
+   sp2 := iif(x1 > x2,x1,iif(x2 > x3,x2,iif(x3 > x4,x3,iif(x4 > x5,x4,iif(x5 > x6,x5,iif(x6 > x7,x6,x7))))))
+
+   nvend1  := space(sp2-x1)+nvend1       
+   cvend1  := space(sp2-x2)+cvend1
+   evend1  := space(sp2-x3)+evend1
+   tvend1  := space(sp2-x4)+tvend1
+   fvend1  := space(sp2-x5)+fvend1
+   emvend1 := space(sp2-x6)+emvend1
+   svend1  := space(sp2-x7)+svend1
+   
+else
+   nvend1  := ""
+   cvend1  := ""
+   evend1  := ""
+   tvend1  := ""
+   fvend1  := ""
+   emvend1 := ""
+   svend1  := ""   
+endif   
+
+dbSelectArea("SA3")
+dbSetOrder(01)
+dbSeek( xFilial("SA3")+xvend2)
+if found()
+   nvend2  := trim(sa3->a3_nome)  // nome do vendedor
+   cvend2  := rtrim(sa3->a3_mens1) // cargo do vendedor
+   evend2  := rtrim(sa3->a3_mens2) // empresa do vendedor
+   tvend2  := rtrim(sa3->a3_tel)
+   fvend2  := rtrim(sa3->a3_fax)
+   emvend2 := rtrim(sa3->a3_email)
+   svend2  := rtrim(sa3->a3_hpage)       
+   
+   x1 := len(nvend2)
+   x2 := len(cvend2)
+   x3 := len(evend2)
+   x4 := len(tvend2)
+   x5 := len(fvend2)
+   x6 := len(emvend2)            
+   x7 := len(svend2)
+      
+   sp2 := iif(x1 > x2,x1,iif(x2 > x3,x2,iif(x3 > x4,x3,iif(x4 > x5,x4,iif(x5 > x6,x5,iif(x6 > x7,x6,x7))))))
+
+   nvend2  := space(sp2-x1)+nvend2       
+   cvend2  := space(sp2-x2)+cvend2
+   evend2  := space(sp2-x3)+evend2
+   tvend2  := space(sp2-x4)+tvend2
+   fvend2  := space(sp2-x5)+fvend2
+   emvend2 := space(sp2-x6)+emvend2
+   svend2  := space(sp2-x7)+svend2
+   
+else
+   nvend2  := ""
+   cvend2  := ""
+   evend2  := ""
+   tvend2  := ""
+   fvend2  := ""
+   emvend2 := ""
+   svend2  := ""  
+endif
+
+m1 := month(ddatabase)
+if  m1 = 1
+   M2  := 'Janeiro'
+   spc := space(3)
+elseif m1 = 2   
+   M2  := 'Fevereiro'
+   spc := ""
+elseif m1 = 3   
+   M2  := 'Marco'
+   spc := space(8)
+elseif m1 = 4   
+   M2  := 'Abril'
+   spc := space(8)
+elseif m1 = 5   
+   M2  := 'Maio'
+   spc := space(9)
+elseif m1 = 6   
+   M2  := 'Junho'
+   spc := space(6)
+elseif m1 = 7   
+   M2  := 'Julho'
+   spc := space(8)
+elseif m1 = 8   
+   M2  := 'Agosto'
+   spc := space(6)
+elseif m1 = 9   
+   M2  := 'Setembro'
+   spc := space(1)
+elseif m1 = 10   
+   M2  := 'Outubro'
+   spc := space(2)
+elseif m1 = 11   
+   M2  := 'Novembro'
+   spc := space(1)
+elseif m1 = 12   
+   M2  := 'Dezembro'
+   spc := space(1)
+endif           
+
+cLogoc := GetSrvProfString("Startpath","") + "logocab.BMP"
+cLogor := GetSrvProfString("Startpath","") + "logorp.BMP"
+
+oPrn:StartPage()
+folha01() // capa
+folha02() // Indice geral
+folha03() // Composicao de fornecimeno
+folha04() // Curvas         
+folha05() // Dimensionais
+folha06() // Desvios e comentarios
+folha07() // Escopo de Fornecimento
+folha08() // Planilha de preços
+folha09() // Lista de sobressalente
+folha10() // Informacoes complementares
+folha11() // Cronograma
+oPrn:EndPage()
+oPrn:End()  
+
+DEFINE MSDIALOG oDlg FROM 264,182 TO 441,613 TITLE cTitulo OF oDlg PIXEL
+@ 004,010 TO 082,157 LABEL "" OF oDlg PIXEL
+
+@ 030,017 SAY "O orcamento foi gerado"	OF oDlg PIXEL Size 150,010 FONT oFont6 COLOR CLR_HBLUE
+@ 06,167 BUTTON "&Imprime" 		SIZE 036,012 ACTION oPrn:Print()   	OF oDlg PIXEL
+@ 28,167 BUTTON "Pre&view" 		SIZE 036,012 ACTION oPrn:Preview() 	OF oDlg PIXEL
+@ 49,167 BUTTON "Sai&r"    		SIZE 036,012 ACTION oDlg:End()     	OF oDlg PIXEL
+
+ACTIVATE MSDIALOG oDlg CENTERED
+
+oPrn:End()
+
+MS_FLUSH()
+Return
+
+*****************************************************************************
+
+STATIC FUNCTION folha01()
+               
+oPrn:StartPage()
+
+OPRN:SayBitmap(030,070,clogoc,2250,400)
+
+OPRN:Say(610,1730,spc+"Cajamar, "+strzero(day(ddatabase),2)+" de "+m2+" de "+strzero(year(ddatabase),4),oFont10N)
+
+OPRN:Box(0680,070,0760,280)
+OPRN:Say(0700,0075,"À: ",oFont10)
+OPRN:Box(0680,280,0760,2300)
+OPRN:Say(0700,285,XNCLI,oFont14N)              
+
+OPRN:Box(0760,070,0840,280)
+OPRN:Say(0790,075, "A/C:",oFont10)
+OPRN:Box(0760,280,0840,2300)
+OPRN:Say(0790,285,XCONTATO,oFont10)
+
+OPRN:Box(0840,0070,0920,280)
+OPRN:Say(0870,0075, "Depto:",oFont10)
+OPRN:Box(0840,0280,0920,2300)
+OPRN:Say(0870,0285,XDEPTO,oFont10)
+
+OPRN:Box(0920,070,1000,280)
+OPRN:Say(0950,075, "Email:",oFont10)
+OPRN:Box(0920,280,1000,2300)
+OPRN:Say(0950,285,XEMAIL,oFont10)
+
+OPRN:Box(1000,070,1080,280)
+OPRN:Say(1030,075, "DDD:",oFont10)
+OPRN:Box(1000,280,1080,2300)
+OPRN:Say(1030,285,xddd,oFont10)                      
+
+OPRN:Box(1080,070,1160,280)
+OPRN:Say(1110,075, "Fone:",oFont10)
+OPRN:Box(1080,280,1160,2300)
+OPRN:Say(1110,285,XTEL,oFont10)
+
+OPRN:Box(1160,070,1240,280)
+OPRN:Say(1190,075, "Proposta nº:",oFont10)
+OPRN:Box(1160,280,1240,2300)
+OPRN:Say(1190,285,XNUM,oFont10)
+
+OPRN:Box(1240,070,1320,280)
+OPRN:Say(1270,075, "Referência:",oFont10)
+OPRN:Box(1240,280,1320,2300)
+OPRN:Say(1270,285,Xrefer,oFont10)
+
+OPRN:Say(1400,820,"Proposta Técnica / Comercial",oFont14N)
+                 
+OPRN:Say(1600,070,"Prezados Senhores",oFont14)
+OPRN:Say(1800,070,"Visando atender vossa solicitação, apresentamos nossa proposta técnica e comercial para o",oFont14)                                                 
+OPRN:Say(1900,070,"fornecimento de bombas centrifugas e/ou Bombas de Engrenagens da marca",oFont14)
+OPRN:Say(1906,1810,"FB BOMBAS",oFont12N)
+
+OPRN:Say(2000,070,"Na expectativa de que a presente seja de seu agrado, colocamo-nos á disposição atravez de nosso",oFont14)
+OPRN:Say(2100,070,"departamento de engenharia/representante para qualquer esclarecimento que se faça necessário.",oFont14)
+
+OPRN:Say(2300,070,"Atenciosamente,",oFont14)             
+                        
+OPRN:Say(2500,0070,NVEND1,oFont12)             
+OPRN:Say(2500,1500,NVEND2,oFont12)             
+
+OPRN:Say(2550,0070,CVEND1,oFont12)             
+OPRN:Say(2550,1500,CVEND2,oFont12)             
+
+OPRN:Say(2600,0070,EVEND1,oFont12)             
+OPRN:Say(2600,1500,EVEND2,oFont12)             
+
+OPRN:Say(2650,0080,TVEND1,oFont12)             
+OPRN:Say(2650,1510,TVEND2,oFont12)             
+
+OPRN:Say(2700,0070,FVEND1,oFont12)             
+OPRN:Say(2700,1500,FVEND2,oFont12)             
+
+OPRN:Say(2750,0070,EMVEND1,oFont12)
+OPRN:Say(2750,1500,EMVEND2,oFont12)
+
+OPRN:Say(2800,070,SVEND1,oFont12)                          
+OPRN:Say(2800,1500,SVEND2,oFont12)                          
+
+OPRN:SayBitmap(3000,070,clogor,2050,250)
+
+oPrn:EndPage()
+
+Return
+
+******************************************************************
+                                                                  
+STATIC FUNCTION folha02()
+
+if len(xindice) = 0
+   return
+endif   
+
+f := 1         
+do while .t.
+   if ! empty(memoline(xindice,,f))
+      f := f +1      
+      loop
+   endif
+   f := f - 1 
+   exit
+enddo    
+
+tcont := 0
+i := 1   
+for i=1 to f
+    if tcont = 0                                                 
+       oPrn:StartPage()
+       OPRN:SayBitmap(030,070,clogoc,2250,400)      
+       OPRN:Box(0450,070,0450,2300)
+       OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+       OPRN:Say(0480,310, XNCLI,oFont13)                       
+       OPRN:Say(0540,076, "PROPOSTA:",oFont10N)
+       OPRN:Say(0540,310, xnum,oFont13)  
+       OPRN:Box(0600,070,0600,2300)
+       OPRN:Say(0750,1000, "INDICE GERAL",oFont16N)    
+       nlin := 950        
+       tcont := 1
+    endif
+
+    OPRN:Say(nlin,700,memoline(xindice,,i),oFont14N)    
+
+    nlin := nlin +160
+    tcont := tcont + 1
+    if tcont > 38
+       tcont := 0
+    endif   
+    if tcont = 0 .or. i >= f
+       OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+       OPRN:SayBitmap(3000,070,clogor,2050,250)
+       oPrn:EndPage()
+    endif
+next         
+                        
+return                                                                                               
+                       
+******************************************************************
+
+STATIC FUNCTION folha03()
+                     
+oPrn:StartPage()
+
+for i=1 to len(xproduto)           
+
+    xdescri := rtrim(xproduto[i,3])
+    
+    xtipob    := xcontruc[i,1]
+    xcarcaca  := xcontruc[i,2]
+    xtampa    := xcontruc[i,3]
+    xengren   := xcontruc[i,4]
+    xmancal   := xcontruc[i,5]
+    xvdeixo   := xcontruc[i,6]
+    xbocais   := xcontruc[i,7]
+    xsrotac   := xcontruc[i,8]
+    xfluxo    := xcontruc[i,9]
+    xcor      := xcontruc[i,10]
+    xeixo     := xcontruc[i,12]
+    xrotor    := xcontruc[i,13]
+   
+    xfluido   := xoperac[i,1]
+    xtemper   := xoperac[i,2]   
+    xunitemp  := xoperac[i,3]
+    xdensid   := xoperac[i,4]
+    xunidens  := xoperac[i,5]
+    xviscos   := xoperac[i,6] 
+    xunivisc  := xoperac[i,7]
+    xvasp     := xoperac[i,8]
+    xunvasp   := xoperac[i,9]
+    xvasn     := xoperac[i,10]
+    xunvazn   := xoperac[i,11]
+    xpm       := xoperac[i,12]
+    xpd       := xoperac[i,13]
+    xnpsh     := xoperac[i,14]
+    xrotacao  := xoperac[i,15]
+    xpotcon   := xoperac[i,16]
+    xtensao   := xoperac[i,17]
+
+    xpressuc := xcurva[i,4]
+    xunsuc   := rtrim(xcurva[i,5])
+    xrecalq  := xcurva[i,6]
+    xunrec   := rtrim(xcurva[i,7])
+
+    xescop1 := {}
+
+    if scj->cj_itepro1 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro1>0,str(scj->cj_qtdpro1,6,2),' '),scj->cj_prdpro1})
+    endif   
+    if scj->cj_itepro2 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro2>0,str(scj->cj_qtdpro2,6,2),' '),scj->cj_prdpro2})
+    endif   
+    if scj->cj_itepro3 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro3>0,str(scj->cj_qtdpro3,6,2),' '),scj->cj_prdpro3})
+    endif   
+    if scj->cj_itepro4 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro4>0,str(scj->cj_qtdpro4,6,2),' '),scj->cj_prdpro4})
+    endif   
+    if scj->cj_itepro5 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro5>0,str(scj->cj_qtdpro5,6,2),' '),scj->cj_prdpro5})
+    endif   
+    if scj->cj_itepro6 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro6>0,str(scj->cj_qtdpro6,6,2),' '),scj->cj_prdpro6})
+    endif   
+    if scj->cj_itepro7 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro7>0,str(scj->cj_qtdpro7,6,2),' '),scj->cj_prdpro7})
+    endif   
+    if scj->cj_itepro8 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro8>0,str(scj->cj_qtdpro8,6,2),' '),scj->cj_prdpro8})
+    endif   
+    if scj->cj_itepro9 = xproduto[i,1]
+       aadd(xescop1,{iif(scj->cj_qtdpro9>0,str(scj->cj_qtdpro9,6,2),' '),scj->cj_prdpro9})
+    endif   
+
+    if len(xescop1) = 0
+       xq1 := ''
+       xp1 := ''
+       xq2 := ''
+       xp2 := ''
+       xq3 := ''
+       xp3 := ''
+       xq4 := ''
+       xp4 := ''                
+       xq5 := ''
+       xp5 := ''
+       xq6 := ''
+       xp6 := ''
+       xq7 := ''
+       xp7 := ''
+    endif        
+
+
+    if len(xescop1) = 1
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := ''
+       xp2 := ''
+       xq3 := ''
+       xp3 := ''
+       xq4 := ''
+       xp4 := ''                
+       xq5 := ''
+       xp5 := ''
+       xq6 := ''
+       xp6 := ''
+       xq7 := ''
+       xp7 := ''
+    endif        
+    
+    if len(xescop1) = 2
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := xescop1[2,1]
+       xp2 := xescop1[2,2]
+       xq3 := ''
+       xp3 := ''
+       xq4 := ''
+       xp4 := ''                
+       xq5 := ''
+       xp5 := ''
+       xq6 := ''
+       xp6 := ''
+       xq7 := ''
+       xp7 := ''
+    endif       
+    
+    if len(xescop1) = 3
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := xescop1[2,1]
+       xp2 := xescop1[2,2]
+       xq3 := xescop1[3,1]
+       xp3 := xescop1[3,2]
+       xq4 := ''
+       xp4 := ''                
+       xq5 := ''
+       xp5 := ''
+       xq6 := ''
+       xp6 := ''
+       xq7 := ''
+       xp7 := ''
+    endif            
+                     
+    if len(xescop1) = 4
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := xescop1[2,1]
+       xp2 := xescop1[2,2]
+       xq3 := xescop1[3,1]
+       xp3 := xescop1[3,2]
+       xq4 := xescop1[4,1]
+       xp4 := xescop1[4,2]                
+       xq5 := ''
+       xp5 := ''
+       xq6 := ''
+       xp6 := ''
+       xq7 := ''
+       xp7 := ''
+    endif                
+                         
+    if len(xescop1) = 5
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := xescop1[2,1]
+       xp2 := xescop1[2,2]
+       xq3 := xescop1[3,1]
+       xp3 := xescop1[3,2]
+       xq4 := xescop1[4,1]
+       xp4 := xescop1[4,2]                
+       xq5 := xescop1[5,1]
+       xp5 := xescop1[5,2]
+       xq6 := ''
+       xp6 := ''
+       xq7 := ''
+       xp7 := ''
+    endif                
+    
+    if len(xescop1) = 6
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := xescop1[2,1]
+       xp2 := xescop1[2,2]
+       xq3 := xescop1[3,1]
+       xp3 := xescop1[3,2]
+       xq4 := xescop1[4,1]
+       xp4 := xescop1[4,2]                
+       xq5 := xescop1[5,1]
+       xp5 := xescop1[5,2]
+       xq6 := xescop1[6,1]
+       xp6 := xescop1[6,2]
+       xq7 := ''
+       xp7 := ''
+    endif            
+                     
+    if len(xescop1) = 7
+       xq1 := xescop1[1,1]
+       xp1 := xescop1[1,2]
+       xq2 := xescop1[2,1]
+       xp2 := xescop1[2,2]
+       xq3 := xescop1[3,1]
+       xp3 := xescop1[3,2]
+       xq4 := xescop1[4,1]
+       xp4 := xescop1[4,2]                
+       xq5 := xescop1[5,1]
+       xp5 := xescop1[5,2]
+       xq6 := xescop1[6,1]
+       xp6 := xescop1[6,2]
+       xq7 := xescop1[7,1]
+       xp7 := xescop1[7,2]
+    endif                
+
+    cfile := xoperac[i,18]
+    cLogop := GetSrvProfString("Startpath","")+patimgprd+iif(empty(cfile),'padrao.bmp',cfile)    
+
+    OPRN:SayBitmap(030,070,clogoc,2250,400)
+      
+    OPRN:Box(0450,070,0450,2300)
+
+    OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+    OPRN:Say(0480,310, XNCLI,oFont13)
+                       
+    OPRN:Say(0540,075, "PROJETO:",oFont10N)
+    OPRN:Say(0540,310,Xrefer,oFont13)
+
+    OPRN:Say(0540,2000, "QUANT:",oFont10N)
+    OPRN:Say(0540,2150,strzero(xqtd,2),oFont12)
+
+    OPRN:Say(0600,076, "PROPOSTA:",oFont10N)
+    OPRN:Say(0600,310, xnum+"   -  ITEM "+xproduto[i,1],oFont13)
+  
+    OPRN:Box(0660,070,0660,2300)
+    OPRN:Say(0690,070,xdescri,oFont10N)
+
+    OPRN:Box(0770,070,0830,900) // 60v  
+    OPRN:Say(0780,085,"Tipo",oFont10)
+    OPRN:Box(0770,0900,0830,2300) // 60v
+    OPRN:Say(0780,0915,xtipob,oFont10)    
+    
+    OPRN:Box(0830,070,0890,900) // 60v  
+    OPRN:Say(0840,085,"carcaça",oFont10)
+    OPRN:Box(0830,0900,0890,2300) // 70v
+    OPRN:Say(0840,0915,xcarcaca,oFont10)                               
+
+    OPRN:Box(0890,070,0950,900) // 70v  
+    OPRN:Say(0900,085,"Tampa",oFont10)
+    OPRN:Box(0890,0900,0950,2300) // 70v
+    OPRN:Say(0900,0915,xtampa,oFont10)                                                            
+                                                        
+    OPRN:Box(0950,070,1010,900) // 70v  
+    OPRN:Say(0960,085,"Engrenagens",oFont10)
+    OPRN:Box(0950,0900,1010,2300) // 70v
+    OPRN:Say(0960,0915,iif(empty(xengren),"Não se aplica",xengren),oFont10)    
+                                                        
+    OPRN:Box(1010,070,1070,900) // 70v  
+    OPRN:Say(1020,085,"Mancais",oFont10)
+    OPRN:Box(1010,0900,1070,2300) // 70v
+    OPRN:Say(1020,0915,iif(empty(xmancal),"Não se aplica",xmancal),oFont10)    
+
+    OPRN:Box(1070,070,1130,900) // 70v  
+    OPRN:Say(1080,085,"Eixo",oFont10)
+    OPRN:Box(1070,0900,1130,2300) // 70v
+    OPRN:Say(1080,0915,xeixo,oFont10)                                     
+                                                           
+    OPRN:Box(1130,070,1190,900) // 70v  
+    OPRN:Say(1140,085,"Vedação de eixo",oFont10)
+    OPRN:Box(1130,0900,1190,2300) // 70v
+    OPRN:Say(1140,0915,xvdeixo,oFont10)                     
+
+    OPRN:Box(1190,070,1250,900) // 70v  
+    OPRN:Say(1200,085,"Rotor",oFont10)
+    OPRN:Box(1190,0900,1250,2300) // 70v
+    OPRN:Say(1200,0915,xrotor,oFont10)                                     
+                                                                                
+    OPRN:Box(1250,070,1310,900) // 70v  
+    OPRN:Say(1260,085,"Bocais de succão e pressão",oFont10)
+    OPRN:Box(1250,0900,1310,2300) // 70v
+    OPRN:Say(1250,0915,xpressuc+" "+xunsuc+"/"+xrecalq+" "+xunrec+"  "+xbocais,oFont10)
+                                                                                            
+    OPRN:Box(1310,070,1370,900) // 70v  
+    OPRN:Say(1310,085,"Sentido de rotação",oFont10)
+    OPRN:Box(1310,0900,1370,2300) // 70v
+    OPRN:Say(1310,0915,xsrotac,oFont10)                     
+                                                                                            
+    OPRN:Box(1370,070,1430,900) // 70v  
+    OPRN:Say(1380,085,"Sentido de fluxo",oFont10)
+    OPRN:Box(1370,0900,1430,2300) // 70v
+    OPRN:Say(1380,0915,xfluxo,oFont10)                              
+
+    OPRN:Box(1430,070,1490,900) // 70v  
+    OPRN:Say(1440,085,"Cor",oFont10)
+    OPRN:Box(1430,0900,1490,2300) // 70v
+    OPRN:Say(1440,0915,xcor,oFont10)                              
+
+    OPRN:Say(1510,070,"CONDIÇÕES DE TRABALHO",oFont10N)
+
+    OPRN:Box(1570,070,1640,900) // 70v  
+    OPRN:Say(1580,085,"Produto a bombear",oFont10)
+    OPRN:Box(1570,0900,1640,2300) // 70v
+    OPRN:Say(1580,0915,xfluido,oFont10)                                                   
+
+    OPRN:Box(1640,070,1710,900) // 70v  
+    OPRN:Say(1650,085,"Temperatura",oFont10)
+    OPRN:Box(1640,0900,1710,1500) // 70v
+    OPRN:Say(1650,0915,xtemper+" "+xunitemp,oFont10)
+
+    OPRN:Box(1710,070,1780,900) // 70v  
+    OPRN:Say(1720,085,"Densidade",oFont10)
+    OPRN:Box(1710,0900,1780,1500) // 70v
+    OPRN:Say(1720,0915,xdensid+" "+xundensi,oFont10)
+
+    OPRN:Box(1780,070,1850,900) // 70v  
+    OPRN:Say(1790,085,"Viscosidade",oFont10)
+    OPRN:Box(1780,0900,1850,1500) // 70v
+    OPRN:Say(1790,0915,xviscos+" "+xunivisc,oFont10)
+                                      
+    OPRN:Box(1850,070,1920,900) // 70v  
+    OPRN:Say(1860,085,"Vazão do projeto",oFont10)
+    OPRN:Box(1850,0900,1920,1500) // 70v
+    OPRN:Say(1860,0915,xvasp+" "+xunvasp,oFont10)              
+                                
+    OPRN:Box(1920,070,1980,900) // 70v  
+    OPRN:Say(1930,085,"Vazao nominal",oFont10)
+    OPRN:Box(1920,0900,1980,1500) // 70v
+    OPRN:Say(1930,0915,xvasn+" "+xunvazn,oFont10)              
+
+    OPRN:Box(1980,070,2060,900) // 70v  
+    OPRN:Say(2000,085,"Pressão manométrica",oFont10)
+    OPRN:Box(1980,0900,2060,1500) // 70v
+    OPRN:Say(2000,0915,xpm,oFont10)                                   
+                                                                                             
+    OPRN:Box(2060,070,2130,900) // 70v  
+    OPRN:Say(2070,085,"Pressão diferencial",oFont10)
+    OPRN:Box(2060,0900,2130,1500) // 70v
+    OPRN:Say(2070,0915,xpd,oFont10)                                   
+
+    OPRN:Box(2130,070,2200,900) // 70v  
+    OPRN:Say(2140,085,"NPSH requerido",oFont10)
+    OPRN:Box(2130,0900,2200,1500) // 70v
+    OPRN:Say(2140,0915,xnpsh,oFont10)                                                           
+                                                                                             
+    OPRN:Box(2200,070,2270,900) // 70v  
+    OPRN:Say(2210,085,"Rotação",oFont10)
+    OPRN:Box(2200,0900,2270,1500) // 70v
+    OPRN:Say(2210,0915,xrotacao,oFont10)                                                           
+                                                                                             
+    OPRN:Box(2270,070,2340,900) // 70v  
+    OPRN:Say(2280,085,"Potência consumida",oFont10)
+    OPRN:Box(2270,0900,2340,1500) // 70v
+    OPRN:Say(2280,0915,xpotcon,oFont10)                                                           
+
+    OPRN:Box(2340,070,2410,900) // 70v  
+    OPRN:Say(2350,085,"Tensão de alimentação",oFont10)
+    OPRN:Box(2340,0900,2410,1500) // 70v
+    OPRN:Say(2350,0915,xtensao,oFont10)                                                                                                                                                       
+
+    OPRN:Box(1640,1500,2410,2300)
+    OPRN:SayBitmap(1750,1600,clogop,600,600)
+                                            
+    OPRN:Say(2430,070,"COMPOSIÇÃO DE FORNECIMENTO",oFont10N)
+
+    OPRN:Box(2490,070,2550,300) // 70v  
+    OPRN:Say(2500,085,xq1,oFont10)
+    OPRN:Box(2490,300,2550,2300) // 70v
+    OPRN:Say(2500,315,xp1,oFont10)    
+
+    OPRN:Box(2550,070,2610,300) // 70v  
+    OPRN:Say(2560,085,xq2,oFont10)
+    OPRN:Box(2550,300,2610,2300) // 70v
+    OPRN:Say(2560,315,xp2,oFont10)                                          
+                    
+    OPRN:Box(2610,070,2670,300) // 70v  
+    OPRN:Say(2620,085,xq3,oFont10)
+    OPRN:Box(2610,300,2670,2300) // 70v
+    OPRN:Say(2620,315,xp3,oFont10)                                          
+                                                                           
+    OPRN:Box(2670,070,2740,300) // 70v  
+    OPRN:Say(2680,085,xq4,oFont10)
+    OPRN:Box(2670,300,2740,2300) // 70v
+    OPRN:Say(2680,315,xp4,oFont10)                                                          
+                          
+    OPRN:Box(2740,070,2800,300) // 70v  
+    OPRN:Say(2750,085,xq5,oFont10)
+    OPRN:Box(2740,300,2800,2300) // 70v
+    OPRN:Say(2750,315,xp5,oFont10)                                                          
+
+    OPRN:Box(2800,070,2860,300) // 70v  
+    OPRN:Say(2810,085,xq6,oFont10)
+    OPRN:Box(2800,300,2860,2300) // 70v
+    OPRN:Say(2810,315,xp6,oFont10)                                                                             
+
+    OPRN:Box(2860,070,2920,300) // 70v  
+    OPRN:Say(2870,085,xq7,oFont10)
+    OPRN:Box(2860,300,2920,2300) // 70v
+    OPRN:Say(2870,315,xp7,oFont10)                                                                             
+
+    OPRN:Say(2940,070,"ISGQ 021_3 REV 00",oFont10)
+
+    OPRN:SayBitmap(3000,070,clogor,2050,250)
+
+    oPrn:EndPage()
+
+next
+return
+
+************************************************************************
+                                                                        
+STATIC FUNCTION folha04()
+                     
+for i=1 to len(xproduto)           
+
+    patimgcurv := getmv("mv_imgcurv")
+    xdescri := rtrim(xproduto[i,3])
+    
+    xncurva  := xcurva[i,1]
+    xdiamrot := xcurva[i,2]
+    xabertur := xcurva[i,3]
+    xsuc     := xcurva[i,4]
+    xunsuc   := xcurva[i,5]
+    xrec     := xcurva[i,6]
+    xunrec   := xcurva[i,7]    
+
+    xcurva1  := xcurva[i,08]
+    xcurva2  := xcurva[i,09]
+    xcurva3  := xcurva[i,10]
+    xcurva4  := xcurva[i,11]
+
+    if empty(xcurva1)
+       return
+    endif   
+    
+    xcurva1 := GetSrvProfString("Startpath","")+patimgcurv+xcurva1    
+    xcurva2 := GetSrvProfString("Startpath","")+patimgcurv+xcurva2    
+    xcurva3 := GetSrvProfString("Startpath","")+patimgcurv+xcurva3    
+    xcurva4 := GetSrvProfString("Startpath","")+patimgcurv+xcurva4    
+
+    oPrn:StartPage()
+    
+    OPRN:SayBitmap(030,070,clogoc,2250,400)
+      
+    OPRN:Box(0450,070,0450,2300)
+
+    OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+    OPRN:Say(0480,310, XNCLI,oFont13)
+                       
+    OPRN:Say(0540,075, "PROJETO:",oFont10N)
+    OPRN:Say(0540,310,Xrefer,oFont13)
+
+    OPRN:Say(0540,2000, "QUANT:",oFont10N)
+    OPRN:Say(0540,2150,strzero(xqtd,2),oFont12)
+
+    OPRN:Say(0600,076, "PROPOSTA:",oFont10N)
+    OPRN:Say(0600,310, xnum+"   -  ITEM "+xproduto[i,1],oFont13)
+  
+    OPRN:Box(0660,070,0660,2300)
+    OPRN:Say(0690,076,xdescri,oFont10N)
+    
+
+    OPRN:Box(0760,070,0870,380) // 70v  
+    OPRN:Say(0770,105,"Curva Numero",oFont10)
+    OPRN:Say(0820,105,xncurva,oFont10)                       
+
+    OPRN:Box(0760,380,0870,500) // 70v  
+    OPRN:Say(0800,0400,"Rotor",oFont10)
+
+    OPRN:Box(0760,500,0870,860) // 70v
+    OPRN:Say(0770,0600,"Diametro",oFont10)
+    OPRN:Say(0820,0600,xdiamrot,oFont10)                 
+
+    OPRN:Box(0760,0860,0870,1220) // 70v
+    OPRN:Say(0770,0970,"Largura",oFont10) 
+    OPRN:Say(0820,0970,xabertur+" mm" ,oFont10)                               
+
+    OPRN:Box(0760,1220,0870,1580) // 70v
+    OPRN:Say(0770,1340,"Sucção",oFont10)
+    OPRN:Say(0820,1340,xsuc+" "+xunsuc,oFont10)
+                                        
+    OPRN:Box(0760,1580,0870,1940) // 70v
+    OPRN:Say(0770,1660,"Recalque",oFont10)
+    OPRN:Say(0820,1660,xrec+" "+xunrec,oFont10)
+    
+    OPRN:Box(0760,1940,0870,2300) // 70v
+    OPRN:Say(0770,2000,"Rotação (rpm)",oFont10)    
+    OPRN:Say(0820,2000,xrotacao,oFont10)
+
+    OPRN:SayBitmap(930,070,xcurva1,2230,900)
+    OPRN:SayBitmap(2000,070,xcurva2,2230,900)
+
+    OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+
+    OPRN:SayBitmap(3000,070,clogor,2050,250)
+
+    oPrn:EndPage()
+                                     
+    /*    Terceira e quarta curva    */
+
+    oPrn:StartPage()
+    
+    OPRN:SayBitmap(030,070,clogoc,2250,400)
+      
+    OPRN:Box(0450,070,0450,2300)
+
+    OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+    OPRN:Say(0480,310, XNCLI,oFont13)
+                       
+    OPRN:Say(0540,075, "PROJETO:",oFont10N)
+    OPRN:Say(0540,310,Xrefer,oFont13)
+
+    OPRN:Say(0540,2000, "QUANT:",oFont10N)
+    OPRN:Say(0540,2150,strzero(xqtd,2),oFont12)
+
+    OPRN:Say(0600,076, "PROPOSTA:",oFont10N)
+    OPRN:Say(0600,310, xnum+"   -  ITEM "+xproduto[i,1],oFont13)
+  
+    OPRN:Box(0660,070,0660,2300)
+    OPRN:Say(0690,076,xdescri,oFont10N)
+    
+
+    OPRN:Box(0760,070,0870,380) // 70v  
+    OPRN:Say(0770,105,"Curva Numero",oFont10)
+    OPRN:Say(0820,105,xncurva,oFont10)                       
+
+    OPRN:Box(0760,380,0870,500) // 70v  
+    OPRN:Say(0800,0400,"Rotor",oFont10)
+
+    OPRN:Box(0760,500,0870,860) // 70v
+    OPRN:Say(0770,0600,"Diametro",oFont10)
+    OPRN:Say(0820,0600,xdiamrot,oFont10)                 
+
+    OPRN:Box(0760,0860,0870,1220) // 70v
+    OPRN:Say(0770,0970,"Largura",oFont10) 
+    OPRN:Say(0820,0970,xabertur+" mm" ,oFont10)                               
+
+    OPRN:Box(0760,1220,0870,1580) // 70v
+    OPRN:Say(0770,1340,"Sucção",oFont10)
+    OPRN:Say(0820,1340,xsuc+" "+xunsuc,oFont10)
+                                        
+    OPRN:Box(0760,1580,0870,1940) // 70v
+    OPRN:Say(0770,1660,"Recalque",oFont10)
+    OPRN:Say(0820,1660,xrec+" "+xunrec,oFont10)
+    
+    OPRN:Box(0760,1940,0870,2300) // 70v
+    OPRN:Say(0770,2000,"Rotação (rpm)",oFont10)    
+    OPRN:Say(0820,2000,xrotacao,oFont10)
+
+
+    OPRN:SayBitmap(930,070,xcurva3,2230,900)
+    OPRN:SayBitmap(2000,070,xcurva4,2230,900)
+
+    OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+
+    OPRN:SayBitmap(3000,070,clogor,2050,250)
+
+    oPrn:EndPage()
+
+next
+return                 
+
+***********************************************************************
+
+Static Function folha05()
+
+if len(xdimen) = 0
+   return
+endif
+//                   1      2        3     4    5    6      7     8     9   10   11   12   13   14    15    16    17   18
+//   aadd(xdimen,{xbomba,xtamanho,xframe,xpeso,xsuc,xrec,ximagem,xdia,xdib,xdic,xdid,xdie,xdif,xdig,xdih1,xdih2,xdih3,xdih4,
+//                 19   20   21   22     23     24     25   26   27   28   29   30   31   32   33   34   35   36   37   38
+//                xdil,xdim,xdin,xdix,xvoluta,xbase,xpbase,xsfx,xsfy,xsfz,xsmx,xsmy,xsmz,xrfx,xrfy,xrfz,xrmx,xrmy,xrmz,xtag,xtipob})
+
+for i = 1 to len(xdimen)
+    
+    xbomba   := xdimen[i,1]
+    xtamanho := xdimen[i,2]
+    xframe   := xdimen[i,3]
+    xpeso    := str(xdimen[i,4],4) 
+    xsuc     := str(xdimen[i,5],5)    
+    xrec     := str(xdimen[i,6],6)    
+    xvoluta  := xdimen[i,23]
+    xbase    := str(xdimen[i,24],4)
+    xpbase    := str(xdimen[i,25],4)
+    
+    xsfx := str(xdimen[i,26],5)                  
+    xsfy := str(xdimen[i,27],5)                  
+    xsfz := str(xdimen[i,28],5)                  
+    xsmx := str(xdimen[i,29],5)                          
+    xsmy := str(xdimen[i,30],5)                          
+    xsmz := str(xdimen[i,31],5)                          
+                                                        
+    xrfx := str(xdimen[i,32],5)                  
+    xrfy := str(xdimen[i,33],5)                  
+    xrfz := str(xdimen[i,34],5)                  
+    xrmx := str(xdimen[i,35],5)                          
+    xrmy := str(xdimen[i,36],5)                          
+    xrmz := str(xdimen[i,37],5)                                  
+                           
+    xtag := xdimen[i,38]
+    xtipob := xdimen[i,39]
+
+    xdia   := iif(xdimen[i, 8]<>0,str(xdimen[i, 8],4),"")
+    xdib   := iif(xdimen[i, 9]<>0,str(xdimen[i, 9],4),"")
+    xdic   := iif(xdimen[i,10]<>0,str(xdimen[i,10],4),"")
+    xdid   := iif(xdimen[i,11]<>0,str(xdimen[i,11],4),"")
+    xdie   := iif(xdimen[i,12]<>0,str(xdimen[i,12],4),"")
+    xdif   := iif(xdimen[i,13]<>0,str(xdimen[i,13],4),"")
+    xdig   := iif(xdimen[i,14]<>0,str(xdimen[i,14],4),"")
+    xdih1  := iif(xdimen[i,15]<>0,str(xdimen[i,15],4),"")
+    xdih2  := iif(xdimen[i,16]<>0,str(xdimen[i,16],4),"")
+    xdih3  := iif(xdimen[i,17]<>0,str(xdimen[i,17],4),"")
+    xdih4  := iif(xdimen[i,18]<>0,str(xdimen[i,18],4),"")
+    xdil   := iif(xdimen[i,19]<>0,str(xdimen[i,19],4),"")    
+    xdim   := iif(xdimen[i,20]<>0,str(xdimen[i,20],4),"")    
+    xdin   := iif(xdimen[i,21]<>0,str(xdimen[i,21],4),"")    
+    xdix   := iif(xdimen[i,22]<>0,str(xdimen[i,22],4),"")                                    
+
+    ximgdim := GetSrvProfString("Startpath","")+"imgdim\"+xdimen[i,7]    
+
+    oPrn:StartPage()
+    OPRN:SayBitmap(030,070,clogoc,2250,400)      
+    OPRN:Box(0450,070,0450,2300)
+    OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+    OPRN:Say(0480,310, XNCLI,oFont13)                       
+    OPRN:Say(0540,076, "PROPOSTA:",oFont10N)
+    OPRN:Say(0540,310, xnum,oFont13)  
+    OPRN:Box(0600,070,0600,2300)
+    OPRN:Say(0650,770, "DIMENSIONAL CONJUNTO MOTO-BOMBA "+xbomba,oFont12N)        
+    
+    OPRN:SayBitmap(730,070,ximgdim,2230,900)
+    
+    OPRN:Box(1650,070,1650,2300)
+    OPRN:Say(1700,850, "DIMENSÕES DA BOMBA (mm)",oFont14N)            
+   
+    OPRN:Box(1800,070,2000,300) // 70v
+    OPRN:Say(1900,100,'   T A G',oFont10N)  
+    
+    OPRN:Box(2000,070,2100,300) // 70v
+    OPRN:Say(2050,080,xtag,oFont10)   
+                                              
+    OPRN:Box(1800,300,2000,530) // 70v
+
+    OPRN:Say(1830,310,"TAMANHO",oFont10N)  
+    OPRN:Say(1930,310,"DA BOMBA",oFont10N)                         
+    
+    OPRN:Box(2000,300,2100,530) // 70v
+    OPRN:Say(2050,310,xtamanho,oFont10)                          
+
+                                                                      
+    OPRN:Box(1800,530,2000,650) // 70v
+    OPRN:Say(1930,540,"PESO",oFont10N)
+    
+    OPRN:Box(2000,530,2100,650) // 70v
+    OPRN:Say(2050,560,xpeso,oFont10)                          
+
+                                                               
+    OPRN:Box(1800,650,2000,770) // 70v
+    OPRN:Say(1930,670,"SUC.",oFont10N)  
+    
+    OPRN:Box(2000,650,2100,770) // 70v
+    OPRN:Say(2050,670,xsuc,oFont10)                           
+
+    
+    OPRN:Box(1800,770,2000,890) // 70v
+    OPRN:Say(1930,790,"REC.",oFont10N)  
+    
+    OPRN:Box(2000,770,2100,890) // 70v
+    OPRN:Say(2050,790,xrec,oFont10)                          
+                    
+/**************************************************/
+    c := 890
+    if ! empty(xdia)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  A ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdia,oFont10)                              
+       c := C + 100
+    endif      
+               
+    if ! empty(xdib)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  B ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdib,oFont10)                              
+       c := c + 100
+    endif          
+                   
+    if ! empty(xdic)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  C ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdic,oFont10)                              
+       c := c + 100
+    endif                                        
+    
+    if ! empty(xdid)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  D ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdid,oFont10)                              
+       c := c + 100
+    endif          
+                   
+    if ! empty(xdie)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  E ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdie,oFont10)                              
+       c := c + 100
+    endif                         
+                   
+    if ! empty(xdif)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  F ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdif,oFont10)                              
+       c := c + 100
+    endif                                  
+
+    if ! empty(xdig)
+       OPRN:Box(1800,c,2100,c+100) // 70v
+       OPRN:Say(1930,c+20,"  G ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdig,oFont10)                              
+       c := c + 100
+    endif                                      
+
+    if ! empty(xdih1)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  H1 ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdih1,oFont10)                              
+       c := c + 100
+    endif                                  
+                                           
+    if ! empty(xdih2)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  H2 ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdih2,oFont10)                              
+       c := c + 100
+    endif                      
+
+    if ! empty(xdih3)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  H3 ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdih3,oFont10)                              
+       c := c + 100
+    endif           
+    
+    if ! empty(xdih4)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  H4 ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdih4,oFont10)                              
+       c := c + 100
+    endif           
+
+    if ! empty(xdil)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  L ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdil,oFont10)                              
+       c := c + 100
+    endif                                                                                                    
+
+    if ! empty(xdim)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  M ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdim,oFont10)                              
+       c := c + 100
+    endif                                                                                                    
+
+    if ! empty(xdin)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  N ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdin,oFont10)                              
+       c := c + 100
+    endif          
+                   
+    if ! empty(xdix)
+       OPRN:Box(1800,c,2000,c+100) // 70v
+       OPRN:Say(1930,c+20,"  X ",oFont10N)  
+    
+       OPRN:Box(2000,c,2100,c+100) // 70v
+       OPRN:Say(2050,c+10,xdix,oFont10)                              
+       c := c + 100
+    endif                                                                                                            
+/**********************************************************/
+
+    OPRN:Box(2200,070,2400,250) // 70v
+    OPRN:Say(2250,100,'VOLUTA',oFont10N)  
+    OPRN:Say(2300,150,'DA',oFont10N)  
+    OPRN:Say(2350,100,'BOMBA',oFont10N)  
+        
+    OPRN:Box(2400,070,2500,250) // 70v
+    OPRN:Say(2450,100,xvoluta,oFont10)   
+                 
+                                              
+    OPRN:Box(2200,250,2400,430) // 70v
+    OPRN:Say(2250,270," MOTOR ",oFont10N)  
+    OPRN:Say(2300,270," FRAME ",oFont10N)  
+
+    OPRN:Box(2400,250,2500,430) // 70v
+    OPRN:Say(2450,300,xframe,oFont10)                         
+                 
+    if xtipob <> '1'
+       if val(xbase) <> 0
+          OPRN:Box(2200,430,2400,610) // 70v
+          OPRN:Say(2250,450," BASE ",oFont10N)  
+          OPRN:Say(2300,450," API N.",oFont10N)  
+
+          OPRN:Box(2400,430,2500,610) // 70v
+          OPRN:Say(2450,470,xbase,oFont10)                             
+
+          OPRN:Box(2200,610,2400,790) // 70v
+          OPRN:Say(2250,650,"PESO",oFont10N)  
+          OPRN:Say(2300,670,"DA",oFont10N)  
+          OPRN:Say(2350,650,"BASE",oFont10N)  
+
+          OPRN:Box(2400,610,2500,790) // 70v
+          OPRN:Say(2450,660,xpbase,oFont10N)                                 
+       endif   
+    endif               
+/******************************************************/
+
+    if val(xbase) <> 0 
+
+       OPRN:Box(2200,1230,2280,2300) // 70v
+       OPRN:Say(2220,1340,"Diagrama de Forças e Momentos nos Bocais",oFont12N)                                                                                         
+
+       OPRN:Box(2280,1230,2360,1430) // 70v
+       OPRN:Say(2300,1250,"Recalque",oFont12)
+
+       OPRN:Box(2280,1430,2360,1880) // 70v
+       OPRN:Say(2300,1560,"FORCES (N)",oFont12)
+
+       OPRN:Box(2280,1880,2360,2300) // 70v
+       OPRN:Say(2300,1980,"MOMENTS (Nm)",oFont12)
+    
+       OPRN:Box(2360,1230,2440,1430) // 70v
+       OPRN:Say(2380,1250,"DN (mm)",oFont12)    
+                                             
+       OPRN:Box(2360,1430,2440,1580) // 70v
+       OPRN:Say(2380,1490,"Fx",oFont12)    
+    
+       OPRN:Box(2360,1580,2440,1730) // 70v
+       OPRN:Say(2380,1640,"Fy",oFont12)                                            
+
+       OPRN:Box(2360,1730,2440,1880) // 70v
+       OPRN:Say(2380,1790,"Fz",oFont12)  
+   
+       OPRN:Box(2360,1880,2440,2020) // 70v
+       OPRN:Say(2380,1930,"Mx",oFont12)    
+    
+       OPRN:Box(2360,2020,2440,2160) // 70v
+       OPRN:Say(2380,2070,"My",oFont12)                                            
+
+       OPRN:Box(2360,2160,2440,2300) // 70v
+       OPRN:Say(2380,2210,"Mz",oFont12)                                            
+    
+       OPRN:Box(2440,1230,2520,1430) // 70v
+       OPRN:Say(2460,1250,xrec,oFont12)    
+                                             
+       OPRN:Box(2440,1430,2520,1580) // 70v
+       OPRN:Say(2460,1470,xrfx,oFont12)    
+    
+       OPRN:Box(2440,1580,2520,1730) // 70v
+       OPRN:Say(2460,1620,xrfy,oFont12)                                            
+
+       OPRN:Box(2440,1730,2520,1880) // 70v
+       OPRN:Say(2460,1770,xrfz,oFont12)  
+   
+       OPRN:Box(2440,1880,2520,2020) // 70v
+       OPRN:Say(2460,1910,xrmx,oFont12)    
+    
+       OPRN:Box(2440,2020,2520,2160) // 70v
+       OPRN:Say(2460,2050,xrmy,oFont12)                                            
+
+       OPRN:Box(2440,2160,2520,2300) // 70v
+       OPRN:Say(2460,2190,xrmz,oFont12)                                            
+  
+    // Succao
+    
+       OPRN:Box(2520,1230,2600,1430) // 70v
+       OPRN:Say(2540,1250,"Sucção",oFont12)
+
+       OPRN:Box(2520,1430,2600,1880) // 70v
+       OPRN:Say(2540,1560,"FORCES (N)",oFont12)
+
+       OPRN:Box(2520,1880,2600,2300) // 70v
+       OPRN:Say(2540,1980,"MOMENTS (Nm)",oFont12)
+    
+       OPRN:Box(2600,1230,2680,1430) // 70v
+       OPRN:Say(2620,1250,"DN (mm)",oFont12)    
+                                             
+       OPRN:Box(2600,1430,2680,1580) // 70v
+       OPRN:Say(2620,1490,"Fx",oFont12)    
+    
+       OPRN:Box(2600,1580,2680,1730) // 70v
+       OPRN:Say(2620,1640,"Fy",oFont12)                                            
+
+       OPRN:Box(2600,1730,2680,1880) // 70v
+       OPRN:Say(2620,1790,"Fz",oFont12)  
+    
+       OPRN:Box(2600,1880,2680,2020) // 70v
+       OPRN:Say(2620,1930,"Mx",oFont12)    
+    
+       OPRN:Box(2600,2020,2680,2160) // 70v
+       OPRN:Say(2620,2070,"My",oFont12)                                            
+
+       OPRN:Box(2600,2160,2680,2300) // 70v
+       OPRN:Say(2620,2210,"Mz",oFont12)                                            
+ 
+       OPRN:Box(2680,1230,2760,1430) // 70v
+       OPRN:Say(2700,1250,xsuc,oFont12)    
+                                              
+       OPRN:Box(2680,1430,2760,1580) // 70v
+       OPRN:Say(2700,1470,xsfx,oFont12)    
+    
+       OPRN:Box(2680,1580,2760,1730) // 70v
+       OPRN:Say(2700,1620,xsfy,oFont12)                                            
+
+       OPRN:Box(2680,1730,2760,1880) // 70v
+       OPRN:Say(2700,1770,xsfz,oFont12)  
+   
+       OPRN:Box(2680,1880,2760,2020) // 70v
+       OPRN:Say(2700,1910,xsmx,oFont12)    
+    
+       OPRN:Box(2680,2020,2760,2160) // 70v
+       OPRN:Say(2700,2050,xsmy,oFont12)                                            
+
+       OPRN:Box(2680,2160,2760,2300) // 70v
+       OPRN:Say(2700,2190,xsmz,oFont12)                                                
+       
+    endif
+/******************************************************/    
+    
+    
+    OPRN:SayBitmap(3000,070,clogor,2050,250)
+
+    oPrn:EndPage()
+                                  
+next              
+
+return
+
+************************************************************************
+                                                                        
+STATIC FUNCTION folha06()
+
+if len(xdesvio) = 0
+   return
+endif   
+
+f := 1         
+do while .t.
+   if ! empty(memoline(xdesvio,,f))
+      f := f +1      
+      loop
+   endif
+   f := f - 1 
+   exit
+enddo    
+
+tcont := 0
+i := 1   
+for i=1 to f
+    if tcont = 0                                                 
+       oPrn:StartPage()
+       OPRN:SayBitmap(030,070,clogoc,2250,400)      
+       OPRN:Box(0450,070,0450,2300)
+       OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+       OPRN:Say(0480,310, XNCLI,oFont13)                       
+       OPRN:Say(0540,076, "PROPOSTA:",oFont10N)
+       OPRN:Say(0540,310, xnum,oFont13)  
+       OPRN:Box(0600,070,0600,2300)
+       OPRN:Say(0650,1000, "DESVIOS E COMENTÁRIOS",oFont10N)    
+       nlin := 750        
+       tcont := 1
+    endif
+
+    OPRN:Say(nlin,150,memoline(xdesvio,,i),oFont12)    
+
+    nlin := nlin +60
+    tcont := tcont + 1
+    if tcont > 38
+       tcont := 0
+    endif   
+    if tcont = 0 .or. i >= f
+       OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+       OPRN:SayBitmap(3000,070,clogor,2050,250)
+       oPrn:EndPage()
+    endif
+next         
+                        
+return                       
+                       
+************************************************************************
+
+STATIC FUNCTION folha07()
+
+for i = 1 to len(xcontruc)
+    xescopo := xcontruc[i,11]
+    if len(xescopo) = 0
+       return
+    endif   
+
+    f := 1         
+    do while .t.
+       if ! empty(memoline(xescopo,,f))
+          f := f +1      
+          loop
+       endif
+       f := f - 1 
+       exit
+    enddo    
+
+    tcont := 0
+    j := 1   
+    for j=1 to f
+        if tcont = 0                                                 
+           oPrn:StartPage()
+           OPRN:SayBitmap(030,070,clogoc,2250,400)      
+           OPRN:Box(0450,070,0450,2300)
+           OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+           OPRN:Say(0480,310, XNCLI,oFont13)                       
+           OPRN:Say(0540,076, "PROJETO:",oFont10N)
+           OPRN:Say(0540,310, xrefer+"   -  ITEM "+xproduto[i,1],oFont13)  
+           OPRN:Say(0540,2000, "QUANT:",oFont10N)
+           OPRN:Say(0540,2150,strzero(xqtd,2),oFont12)
+           OPRN:Box(0600,070,0600,2300)
+           OPRN:Say(0650,1000, "ESCOPO DE FORNECIMENTO",oFont10N)    
+           nlin := 750        
+           tcont := 1
+        endif
+
+        OPRN:Say(nlin,150,memoline(xescopo,,j),oFont12)    
+
+        nlin := nlin +60
+        tcont := tcont + 1
+        if tcont > 38
+           tcont := 0
+        endif   
+        if tcont = 0 .or. j >= f
+           OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+           OPRN:SayBitmap(3000,070,clogor,2050,250)
+           oPrn:EndPage()
+       endif
+    next         
+next    
+return
+             
+************************************************************************
+
+STATIC FUNCTION folha08()
+                     
+oPrn:StartPage()
+
+OPRN:SayBitmap(030,070,clogoc,2250,400)
+
+OPRN:Box(0470,070,0470,2300)
+OPRN:Say(0490,950,"PLANILHA DE PREÇOS",oFont10N)              
+OPRN:Box(0550,070,0550,2300)
+
+OPRN:Say(0580,075, "CLIENTE:",oFont10N)
+OPRN:Say(0580,290, XNCLI,oFont13)
+                       
+
+OPRN:Say(0640,075, "Projeto:",oFont10N)
+OPRN:Say(0640,290, Xrefer,oFont13)
+
+OPRN:Say(0700,075, "Proposta:",oFont10N)
+OPRN:Say(0700,290, xnum,oFont13)
+
+OPRN:Box(0780,070,870,180)
+OPRN:Say(0800,0085,"ITEM",oFont10)
+
+OPRN:Box(0780,180,870,300)
+OPRN:Say(0800,0200,"QTD",oFont10)                  
+OPRN:Box(0780,300,870,1500)
+OPRN:Say(0800,0310,"DESCRIÇÃO DOS EQUIPAMENTOS",oFont10)                                 
+
+OPRN:Box(0780,1500,870,1770)
+OPRN:Say(0800,1510,"UNITARIO (R$)",oFont10)                                 
+
+OPRN:Box(0780,1770,0870,2030)
+OPRN:Say(0800,1800,"TOTAL (R$)",oFont10)                                 
+
+OPRN:Box(0780,2030,0870,2300)
+OPRN:Say(0800,2050,"%        IPI",oFont10)                                 
+
+lin := 870
+for i=1 to len(xproduto)           
+    xqtd  := xproduto[i,2]           
+    xprod := xproduto[i,3]
+    xtprd := len(xprod)
+    xunit  := xproduto[i,4]
+    xpipi := xproduto[i,6]
+    xvipi   := xvalor* xpipi/100
+    xvalor := xproduto[i,5]+xvipi
+    xtipi  := xtipi + xvipi
+    xtotal := xtotal + xproduto[i,5]+xvipi
+    xsp1 := iif(xunit < 10,70,iif(xunit < 100,60,iif(xunit < 1000,50,iif(xunit < 10000,40,iif(xunit < 100000,30,iif(xunit < 1000000,20,0))))))
+    xsp2 := iif(xvipi < 10,70,iif(xvipi < 100,60,iif(xvipi < 1000,50,iif(xvipi < 10000,40,iif(xvipi < 100000,30,iif(xvipi < 1000000,20,0))))))
+    xsp3 := iif(xvalor < 10,70,iif(xvalor < 100,60,iif(xvalor < 1000,50,iif(xvalor < 10000,40,iif(xvalor < 100000,30,iif(xvalor < 1000000,20,0))))))
+    
+    OPRN:Box(lin,070,lin+120,180)
+    OPRN:Say(lin+15,0095,xproduto[i,1],oFont10)
+    OPRN:Box(lin,180,lin+120,300)
+    OPRN:Say(lin+15,0210,strzero(xqtd,3),oFont10)                  
+    OPRN:Box(lin,300,lin+120,1500)
+    if len(xprod) > 60
+       OPRN:Say(lin+15,0310,subs(xprod,1,60),oFont10)                                 
+       OPRN:Say(lin+60,0310,ltrim(subs(xprod,61,xtprd)),oFont10)                                        
+    else
+       OPRN:Say(lin+15,0310,xprod,oFont10)                                     
+    endif             
+    
+    OPRN:Box(lin,1500,lin+120,1770)
+    OPRN:Say(lin+20,1530+xsp1,transform(xunit,"@E 99,999,999.99"),oFont10)                                 
+
+    OPRN:Box(lin,1770,lin+120,2030)
+    OPRN:Say(lin+20,1790+xsp3,transform(xvalor,"@E 99,999,999.99"),oFont10)                                     
+
+    OPRN:Box(lin,2030,lin+120,2300)
+    OPRN:Say(lin+20,2050,strzero(xpipi,2),oFont10)                         
+    OPRN:Say(lin+20,2090+xsp2,transform(xvipi,"@E 999,999.99"),oFont10)                                                     
+    lin := lin +120
+next                                 
+
+xsp4 := iif(xtotal < 10,70,iif(xtotal < 100,60,iif(xtotal < 1000,50,iif(xtotal < 10000,40,iif(xtotal < 100000,30,iif(xtotal < 1000000,20,0))))))
+xsp5 := iif(xtipi < 10,70,iif(xtipi < 100,60,iif(xtipi < 1000,50,iif(xtipi < 10000,40,iif(xtipi < 100000,30,iif(xtipi < 1000000,20,0))))))
+
+
+OPRN:Box(lin,1500,lin+120,1770)
+OPRN:Say(lin+40,1510,"VALOR TOTAL",oFont10)                                 
+
+OPRN:Box(lin,1770,lin+120,2030)
+OPRN:Say(lin+40,1790+xsp4,transform(xtotal,"@E 99,999,999.99"),oFont10)                                 
+
+OPRN:Box(lin,2030,lin+120,2300)
+OPRN:Say(lin+40,2090+xsp5,transform(xtipi,"@E 999,999.99"),oFont10)                                 
+
+
+OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+
+OPRN:SayBitmap(3000,070,clogor,2050,250)
+
+oPrn:EndPage()
+
+return
+
+************************************************************************
+
+STATIC FUNCTION folha09()
+
+for i = 1 to len(xcontruc)
+    xsobres := xcontruc[i,14]
+    if len(xsobres) = 0
+       return
+    endif   
+
+    f := 1         
+    do while .t.
+       if ! empty(memoline(xsobres,,f))
+          f := f +1      
+          loop
+       endif
+       f := f - 1 
+       exit
+    enddo    
+
+    tcont := 0
+    j := 1   
+    for j=1 to f
+        if tcont = 0                                                 
+           oPrn:StartPage()
+           OPRN:SayBitmap(030,070,clogoc,2250,400)      
+           OPRN:Box(0450,070,0450,2300)               
+           
+           OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+           OPRN:Say(0480,310, XNCLI,oFont13)                       
+           OPRN:Say(0540,076, "PROJETO:",oFont10N)
+           OPRN:Say(0540,310, xrefer+"   -  ITEM "+xproduto[i,1],oFont13)  
+           OPRN:Say(0540,2000, "QUANT:",oFont10N)
+           OPRN:Say(0540,2150,strzero(xqtd,2),oFont12)           
+           OPRN:Box(0600,070,0600,2300)
+           OPRN:Say(0650,1000, "LISTA DE SOBRESSALENTES",oFont10N)    
+           nlin := 750        
+           tcont := 1
+        endif
+
+        OPRN:Say(nlin,150,memoline(xsobres,,j),oFont12)    
+
+        nlin := nlin +60
+        tcont := tcont + 1
+        if tcont > 38
+           tcont := 0
+        endif   
+        if tcont = 0 .or. j >= f
+           OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+           OPRN:SayBitmap(3000,070,clogor,2050,250)
+           oPrn:EndPage()
+       endif
+    next         
+next    
+return
+
+*******************************************************************
+
+
+STATIC FUNCTION folha10()
+                     
+oPrn:StartPage()
+
+OPRN:SayBitmap(030,070,clogoc,2250,400)
+
+OPRN:Say(450,070,"Proposta: "+xnum,oFont10N)
+
+OPRN:Box(0500,070,0500,2300)
+OPRN:Say(0510,850,"INFORMAÇÕES COMPLEMENTARES",oFont10N)              
+OPRN:Box(0570,070,0570,2300)
+
+OPRN:Say(0580,075, "EXTENSÃO DE FORNECIMENTO:",oFont10N)
+OPRN:Say(0570,670, "Estamos prevendo fornecer / executar somente os itens indicados no escopo",oFont13)
+OPRN:Say(0630,070, "desta proposta.  Qualquer outro tipo de equipamento,  componente, acessorio, serviço, teste ou documen-",oFont13)                        
+OPRN:Say(0690,070, "tação adicional que se fizer necessário poderá ser acrescido mediante preços e prazos adicionais.",oFont13)
+          
+OPRN:Say(0760,070, "OBSERVAÇÃO:",oFont10N)                        
+OPRN:Say(0750,350, xobsgera,oFont13)
+
+OPRN:Say(0830,070, "DOCUMENTAÇÃO:",oFont10N)                        
+OPRN:Say(0820,400, "Conforme padrão FB Bombas;",oFont13)                        
+
+OPRN:Say(0890,070, "GARANTIA:",oFont10N)                        
+OPRN:Say(0880,300, "Os equipamentos fornecidos serão garantidos por um periodo de 12(doze) meses após a data",oFont13)                        
+OPRN:Say(0940,070, "de entrada do material em serviço ou 18 (dezoito) meses a partir da data de entrega do material.",oFont13)                        
+
+OPRN:Say(1020,070, "MOTOR:",oFont10N)                        
+OPRN:Say(1010,230, "Fornecemos o motor da marca Weg ou similar.",oFont13)                        
+
+OPRN:Box(1090,070,1090,2300)
+OPRN:Say(1105,900,"CONDIÇÕES COMERCIAIS",oFont10N)              
+OPRN:Box(1160,070,1160,2300) 
+
+OPRN:Say(1185,070, "PREÇOS:",oFont10N)                        
+OPRN:Say(1180,250, "Todos os preços apresentados entende-se a vista, considerando que os pagamentos efetuados",oFont13)                        
+OPRN:Say(1240,070, "estritamente de acordo com as condições indicadas na proposta.",oFont13)                        
+OPRN:Say(1300,070, "Os preços ofertados em nossa proposta não incluem qualquer proteção financeira devido a índices  infla-",oFont13)                        
+OPRN:Say(1360,070, "cionários ou condições de pagamento, visto que os preços estão apresentados em quantidades de reais.",oFont13)                        
+OPRN:Say(1420,070, "Assim não estamos prevendo nenhum desconto financeiro ou tabela de deflatores a serem aplicados nos ",oFont13)
+OPRN:Say(1480,070, "preços, faturas ou duplicatas referentes a presente negociação.",oFont13)
+OPRN:Say(1540,070, "Na eventualidade da ocorrência de qualquer alteração na legislação em vigor que venha a repercutir de",oFont13)
+OPRN:Say(1600,070, "alguma forma nesta negociação, a FB Bombas se reserva o direito de renegociar as presentes condições",oFont13)
+OPRN:Say(1660,070, "comerciais.",oFont13)
+OPRN:Say(1720,070, "O valor minimo para faturamento é de R$ 150,00 (Cento e cinquenta Reais)",oFont13)           
+
+OPRN:Say(1810,070, "CONDIÇÕES DE PAGAMENTO:",oFont12N)
+OPRN:Say(1810,710,ncondpg,oFont13)
+
+OPRN:Say(1900,070, "FRETE:",oFont12N)
+OPRN:Say(1900,250,xtpfrete,oFont13)
+
+OPRN:Say(1990,070, "DATA BASE:",oFont12N)
+OPRN:Say(1990,340,dtoc(ddatabase),oFont13)
+         
+OPRN:Say(2080,070, "PRAZO DE ENTREGA:",oFont12N)
+OPRN:Say(2080,540,str(xprazent,3)+" dias, após a data de inicio do prazo contratual, constante no pedido de compras",oFont13)
+OPRN:Say(2140,070,"e Serviços.",oFont13)
+
+OPRN:Say(2230,070, "IMPOSTOS: ICMS:",oFont12N)
+OPRN:Say(2230,460,strzero(xpicm,2)+"%, no caso de bombas centrifugas havera uma redução de base para "+ltrim(str(xbaser))+"%, inclu-",oFont13)
+OPRN:Say(2290,070,"so nos preços dos equipamentos. A aliquota refere-se ao estado de destino do equipamento, consideran-",oFont13)
+OPRN:Say(2350,070,"do que o comprador seja contribuinte do icms. Para empresas não contribuintes, devera ser considerada",oFont13)
+OPRN:Say(2410,070,"a aliquota de ICMS do estado de origem do faturamento, a diferença sera inclusa nos preços informados.",oFont13)
+                 
+OPRN:Say(2500,070, "PIS:",oFont12N)
+OPRN:Say(2500,170,"0,65% e ",oFont13)
+OPRN:Say(2500,350, "COFINS:",oFont12N)
+OPRN:Say(2500,540,"3,00%, inclusos nos equipamentos;",oFont13)
+
+OPRN:Say(2590,070, "IPI:",oFont12N)
+OPRN:Say(2590,150,"Isento, conforme decreto nº 7.394/10 publicado no Diario Oficial de 15 de Dezembro de 2010;",oFont13)
+OPRN:Say(2650,070,"No caso de bombas centrifugas com vazão igual ou menor que 300 litros por minuto o IPI será de 5%.",oFont13)           
+
+OPRN:Say(2740,070, "ISS:",oFont12N)
+OPRN:Say(2740,150,"(Quando aplicável).: Isento;",oFont13)
+                                                         
+OPRN:Say(2830,070, "EMBALAGEM:",oFont12N)
+OPRN:Say(2830,380,"Para produtos seriados sem onus para o cliente(engradado de madeira);",oFont13)
+
+OPRN:Say(2930,070,"ISGQ 021_3 REV 00",oFont10)
+
+OPRN:SayBitmap(3040,070,clogor,2090,250)
+
+oPrn:EndPage()
+
+Return                                                                  
+
+************************************************************************
+
+STATIC FUNCTION folha11()
+
+for i = 1 to len(xcontruc)
+    xcronog := xcontruc[i,15]
+    if len(xcronog) = 0
+       return
+    endif   
+
+    f := 1         
+    do while .t.
+       if ! empty(memoline(xcronog,,f))
+          f := f +1      
+          loop
+       endif
+       f := f - 1 
+       exit
+    enddo    
+
+    tcont := 0
+    j := 1   
+    for j=1 to f
+        if tcont = 0                                                 
+
+           oPrn:StartPage()
+           OPRN:SayBitmap(030,070,clogoc,2250,400)      
+           OPRN:Box(0450,070,0450,2300)
+           OPRN:Say(0480,075, "CLIENTE:",oFont10N)
+           OPRN:Say(0480,310, XNCLI,oFont13)                       
+           OPRN:Say(0540,076, "PROJETO:",oFont10N)
+           OPRN:Say(0540,310, xrefer+"   -  ITEM "+xproduto[i,1],oFont13)  
+           OPRN:Say(0540,2000, "QUANT:",oFont10N)
+           OPRN:Say(0540,2150,strzero(xqtd,2),oFont12)
+           
+           OPRN:Box(0600,070,0600,2300)
+           OPRN:Say(0650,1000, "C R O N O G R A M A",oFont10N)    
+           nlin := 750        
+           tcont := 1
+        endif
+
+        OPRN:Say(nlin,150,memoline(xcronog,,j),oFont12)    
+
+        nlin := nlin +60
+        tcont := tcont + 1
+        if tcont > 38
+           tcont := 0
+        endif   
+        if tcont = 0 .or. j >= f
+           OPRN:Say(2900,070,"ISGQ 021_3 REV 00",oFont10)
+           OPRN:SayBitmap(3000,070,clogor,2050,250)
+           oPrn:EndPage()
+       endif
+    next         
+next    
+return
+
+*******************************************************************
+
+User Function Getimgp()
+
+dimg := getmv("mv_imgprd")
+cFile:= cGetFile( "Arquivos (*.*) | *.*", 'Selecione imagem do produto',,,.F.,GETF_NETWORKDRIVE+GETF_LOCALHARD,.F.,)
+if empty(cfile)
+   return
+endif   
+ccodbar := len(cfile)              
+for i = 0 to ccodbar
+    if subs(cfile,ccodbar-i,1)='\'
+       c_path   := subs(cfile,1,ccodbar-i)
+       c_arquivo := subs(cfile,ccodbar-i+1,i)
+       exit
+    endif
+next          
+xprop := scj->cj_num
+xitem := sck->ck_item
+nfile := GetSrvProfString("Startpath","")+dimg+"P"+xprop+xitem+'.bmp'
+__copyfile(cfile,nfile)
+
+return(c_arquivo) 
+
+*******************************************************************              
+
+User Function Getimgc1()
+
+dimg := getmv("mv_imgcurv") 
+cFile:= cGetFile( "Arquivos (*.*) | *.*", 'Selecione a imagem da curva 1',,,.F.,GETF_NETWORKDRIVE+GETF_LOCALHARD,.F.,)
+if empty(cfile)
+   return
+endif         
+ccodbar := len(cfile)              
+for i = 0 to ccodbar
+    if subs(cfile,ccodbar-i,1)='\'
+       c_path   := subs(cfile,1,ccodbar-i)
+       c_arquivo := subs(cfile,ccodbar-i+1,i)
+       exit
+    endif
+next          
+
+xprop := scj->cj_num
+xitem := sck->ck_item
+nfile := GetSrvProfString("Startpath","")+dimg+"c1"+xprop+xitem+'.bmp'
+__copyfile(cfile,nfile)
+
+return(c_arquivo) 
+
+*******************************************************************                            
+
+User Function Getimgc2()
+
+dimg := getmv("mv_imgcurv") 
+cFile:= cGetFile( "Arquivos (*.*) | *.*", 'Selecione a imagem da curva 2',,,.F.,GETF_NETWORKDRIVE+GETF_LOCALHARD,.F.,)
+if empty(cfile)
+   return
+endif                  
+
+ccodbar := len(cfile)              
+for i = 0 to ccodbar
+    if subs(cfile,ccodbar-i,1)='\'
+       c_path   := subs(cfile,1,ccodbar-i)
+       c_arquivo := subs(cfile,ccodbar-i+1,i)
+       exit
+    endif
+next          
+
+xprop := scj->cj_num
+xitem := sck->ck_item
+nfile := GetSrvProfString("Startpath","")+dimg+"c2"+xprop+xitem+'.bmp'
+__copyfile(cfile,nfile)
+
+return(c_arquivo) 
+
+*******************************************************************              
+
+User Function Getimgc3()
+
+dimg := getmv("mv_imgcurv") 
+cFile:= cGetFile( "Arquivos (*.*) | *.*", 'Selecione a imagem da curva 3',,,.F.,GETF_NETWORKDRIVE+GETF_LOCALHARD,.F.,)
+if empty(cfile)
+   return
+endif         
+
+ccodbar := len(cfile)              
+for i = 0 to ccodbar
+    if subs(cfile,ccodbar-i,1)='\'
+       c_path   := subs(cfile,1,ccodbar-i)
+       c_arquivo := subs(cfile,ccodbar-i+1,i)
+       exit
+    endif
+next                   
+
+xprop := scj->cj_num
+xitem := sck->ck_item
+nfile := GetSrvProfString("Startpath","")+dimg+"c3"+xprop+xitem+'.bmp'
+__copyfile(cfile,nfile)
+
+return(c_arquivo) 
+
+*******************************************************************
+                                                                   
+User Function Getimgc4()
+
+dimg := getmv("mv_imgcurv") 
+cFile:= cGetFile( "Arquivos (*.*) | *.*", 'Selecione a imagem da curva 4',,,.F.,GETF_NETWORKDRIVE+GETF_LOCALHARD,.F.,)
+if empty(cfile)
+   return
+endif         
+
+ccodbar := len(cfile)              
+for i = 0 to ccodbar
+    if subs(cfile,ccodbar-i,1)='\'
+       c_path   := subs(cfile,1,ccodbar-i)
+       c_arquivo := subs(cfile,ccodbar-i+1,i)
+       exit
+    endif
+next                   
+
+xprop := scj->cj_num
+xitem := sck->ck_item
+nfile := GetSrvProfString("Startpath","")+dimg+"c4"+xprop+xitem+'.bmp'
+__copyfile(cfile,nfile)
+
+return(c_arquivo) 
+
+*******************************************************************
+
+/*
+
+//Processo para salvar relatório como imagem
+
+aCaminho           := {"\\192.168.1.8\teste.jpg"}
+filepath          := "\192.168.1.8"
+nwidthpage      := 630
+nheightpage     := 870
+
+aFiles := Directory(aCaminho[1])
+For i:=1 to Len(aFiles)
+	fErase("\\192.168.1.8\"+aFiles[1])
+Next i
+
+oPrint:SaveAllAsJpeg(filepath,nwidthpage,nheightpage,100)   //Gera arquivos JPEG na Pasta \Protheus_data\Images\
+
+aFiles := {}
+aFiles := Directory(aCaminho[1])
+
+//Visualizacao e finalizacao do relatorio
+
+oPrint:Setup()
+oPrint:Preview()
+oPrint:EndPage()
+MS_FLUSH()
+
+Return
+
+************************************************************************
+
+*/
+

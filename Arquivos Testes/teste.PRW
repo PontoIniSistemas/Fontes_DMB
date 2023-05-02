@@ -1,0 +1,15 @@
+User function MA030MEM           
+Local aSaveArea=GetArea()
+Public cQry
+
+DBSelectArea(aspassimplesSA3aspassimples)
+SA3-(DBSetOrder(7)) A3_FILIAL+A3_CODUSR
+if SA3-(DBSeek(xFilial(aspassimplesSA3aspassimples)+__cuserid))
+   cCodVend=SA3-A3_COD
+   cQry=A1_VEND==aspassimples+cCodVend+aspassimples
+   dbSelectArea(aspassimplesSA1aspassimples) 
+   Set Filter to &cQry
+endif   
+
+RestArea(aSaveArea)
+ReturnMA030MEM            
