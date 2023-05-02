@@ -419,7 +419,7 @@ If cTipo == "1"
 				dbSetOrder(1)
 				dbSeek(xFilial("SX5")+"13"+SF4->F4_CF)
 				If Empty(cNatOper)
-					cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[4],1,55))
+					cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[1][4],1,55))
     			EndIf
     		EndIf 
 			// Verifica as notas vinculadas
@@ -885,7 +885,7 @@ Else
 					dbSetOrder(1)
 					dbSeek(xFilial("SX5")+"13"+SF4->F4_CF)
 					If Empty(cNatOper)
-						cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[4],1,55))
+						cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[1][4],1,55))
 	    			EndIf
 	    		EndIf
 				// Verifica as notas vinculadas
