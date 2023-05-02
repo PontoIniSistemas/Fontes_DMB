@@ -476,11 +476,8 @@ If cTipo == "1"
 					cNatOper := SF4->F4_TEXTO
 				EndIf
 			Else	
-				dbSelectArea("SX5")
-				dbSetOrder(1)
-				dbSeek(xFilial("SX5")+"13"+SF4->F4_CF)
 				If Empty(cNatOper)
-					cNatOper := AllTrim(SubStr(SX5->X5_DESCRI,1,55))
+					cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[4],1,55))
     			EndIf
     		EndIf 
 			//旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
@@ -955,11 +952,8 @@ Else
 						cNatOper := SF4->F4_TEXTO					
 					EndIf
 				Else
-					dbSelectArea("SX5")
-					dbSetOrder(1)
-					dbSeek(xFilial("SX5")+"13"+SF4->F4_CF)
 					If Empty(cNatOper)
-						cNatOper := AllTrim(SubStr(SX5->X5_DESCRI,1,55))
+						cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[4],1,55))
 	    			EndIf
 	    		EndIf
 				//旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커

@@ -158,7 +158,9 @@ User function nfseXMLUni( cCodMun, cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLo
 	Local aRetCSL   := {}
 	Local aRetIRR   := {}
 	Local aRetINS   := {}
-	Local cViaPublic := ""		
+	Local cViaPublic := ""
+
+	Local cPar1 := GetMv("MV_TPABISS")
 
 	Private aUF     := {}
 
@@ -449,7 +451,7 @@ User function nfseXMLUni( cCodMun, cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLo
 					If 	(cAliasSE1)->E1_TIPO = MVNOTAFIS .OR. ((cAliasSE1)->E1_ORIGEM = 'LOJA701' .AND. (cAliasSE1)->E1_TIPO $ cWhere)
 
 						//aadd(aDupl,{/*Neogrid não processa alfanumerico*/ "000"+Alltrim((cAliasSE1)->E1_NUM)+Alltrim((cAliasSE1)->E1_PARCELA),(cAliasSE1)->E1_VENCORI,(cAliasSE1)->E1_VALOR,(cAliasSE1)->E1_PARCELA})
-						If GetMv("MV_TPABISS") == "2" .AND. SF2->F2_RECISS == "1"//1-ABATE VALOR LIQ / 2-GERA TITULO ISS
+						If cPar1 == "2" .AND. SF2->F2_RECISS == "1"//1-ABATE VALOR LIQ / 2-GERA TITULO ISS
 							nValFatura := (cAliasSE1)->(E1_VALOR-(E1_COFINS+E1_PIS+E1_CSLL+E1_IRRF+E1_INSS+E1_ISS))
 							aadd(aDupl,{/*Neogrid não processa alfanumerico*/ "000"+(cAliasSE1)->E1_NUM+(cAliasSE1)->E1_PARCELA,(cAliasSE1)->E1_VENCORI,nValFatura,(cAliasSE1)->E1_PARCELA})
 						Else
@@ -1935,6 +1937,8 @@ Static Function servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe
 	Local nScan			:= 0
 	Local nValLiq		:= 0
 	Local nX			:= 0
+
+	Local cPar1 := GetMV("MV_CMPUSR")
 	
 	Default cTpPessoa	:= ""
 	Default cCodMun		:= ""
@@ -2004,7 +2008,7 @@ Static Function servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe
 		cString += "<cnae>"    + allTrim( aProd[nX][19] ) + "</cnae>"
 		cString += "<codtrib>" + allTrim( aProd[nX][34] ) + allTrim( aProd[nX][32] ) + "</codtrib>"
 
-		If ( SC6->(FieldPos("C6_DESCRI")) > 0 .And. Len(aProd[nX]) > 40 .And. !Empty(aProd[nX][41]) ) .And. (!lNFeDesc .And. !GetNewPar("MV_NFESERV","1") == "1" .And. !Empty(GetMV("MV_CMPUSR")) )
+		If ( SC6->(FieldPos("C6_DESCRI")) > 0 .And. Len(aProd[nX]) > 40 .And. !Empty(aProd[nX][41]) ) .And. (!lNFeDesc .And. !GetNewPar("MV_NFESERV","1") == "1" .And. !Empty(cPar1) )
 			cString	+= "<discr>" + AllTrim(aProd[nX][41])+ cCargaTrb + "</discr>"
 		ElseIf !lNFeDesc
 			cString	+= "<discr>" + AllTrim(cNatOper)+ cCargaTrb + "</discr>"

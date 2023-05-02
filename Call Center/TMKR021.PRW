@@ -119,6 +119,8 @@ Local cCabec2	:= "" 			// Label dos itens
 Local cQryAd	:= ""
 Local cName		:= ""
 
+Local cPar1		:= getMV("MV_COMP")
+
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Declaracao de variaveis especificas para este relatorio³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -227,7 +229,7 @@ While	(!Eof())					.AND.;
 			
 			_n_Lin := pRow()
 			_n_Col := pCol()
-			@ _n_Lin,_n_Col PSay chr( getMV( "MV_COMP" ) )
+			@ _n_Lin,_n_Col PSay chr(cPar1)
 			setPrc( _n_Lin,_n_Col )
 			
 			Do Case

@@ -61,7 +61,14 @@ Local lPCCRet     := FindFunction("LJPCCRet")
 Local _cUnidMed   := " "
 Local nValRet     := 0
 Local nTamCupom   := TamSx3("L1_NUMCFIS")[1]      //Quantidade de digitos do numero do cupom 
-Local lFirst      := .T.                          //Controla se eh a primeira chamada da impressao(Argentina)
+Local lFirst      := .T.
+
+Local cPar1 			:= GetMv("MV_ALIQISS")
+Local cPar2				:= GetMV("MV_CODBAR")
+Local cPar3				:= GetMV("MV_TPSOLCF")
+Local cPar4 			:= GetMV("MV_LJPAGTO")
+Local cPar5				:= GetMv('MV_SIMB1')
+Local cpar6				:= GetMV("MV_LJPAGTO")
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica se a data do sistema eh a mesma data da impressora fiscal. ³
@@ -166,7 +173,7 @@ For _nI := 1 To Len(aCols)		// Imprime os itens
 			_cElemen := ExecBlock("LJ220REG",.F.,.F.)
 			
 		ElseIf SF4->F4_ISS == "S" .AND. ( ( ( SA1->A1_RECISS == "1" .AND. GetNewPar("MV_DESCISS", .F.) ) .OR. ( SA1->A1_RECISS <> "1" ) ) )
-    		_cElemen := 'S' + AllTrim (Str( Iif(SB1->B1_ALIQISS>0,SB1->B1_ALIQISS,GetMv("MV_ALIQISS")),5,2 ))
+    		_cElemen := 'S' + AllTrim (Str( Iif(SB1->B1_ALIQISS>0,SB1->B1_ALIQISS,cPar1),5,2 ))
 			
 		ElseIf (SB1->B1_PICMRET > 0 .OR. SB1->B1_PICMENT > 0) .AND. SA1->A1_TIPO $ GetNewPar("MV_TPSOLCF","S,F")
 			_cElemen := "F"                   // Substituicao tributaria (Icms Solidario)
@@ -185,7 +192,7 @@ For _nI := 1 To Len(aCols)		// Imprime os itens
 			_cElemen	:= 'T' + Alltrim(Str(_nPerRet,5,2))
 			
 		EndIf
-		If GetMV("MV_CODBAR") == "S"  .AND. !Empty(SB1->B1_CODBAR)
+		If cPar2 == "S"  .AND. !Empty(SB1->B1_CODBAR)
 			_cCodProd  := Substr(SB1->B1_CODBAR,1,13)
 		Else
         	_cCodProd  := aCols[_nI][_nPosProd]
@@ -202,7 +209,7 @@ For _nI := 1 To Len(aCols)		// Imprime os itens
 		//³A1_TIPO = 'S' deverá sempre ser tributado, independente da configuracao ³
 		//³do TES.                                                                 ³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		If (SA1->A1_TIPO $ GetMV("MV_TPSOLCF") .OR. ( SA1->A1_TIPO == "S" )) .AND. (SF4->F4_INCSOL <> "N")
+		If (SA1->A1_TIPO $ cPar3 .OR. ( SA1->A1_TIPO == "S" )) .AND. (SF4->F4_INCSOL <> "N")
 				aIcmsSol := LjIcmsSol(Val(_cUnit)*aCols[_nI][_nPosQuant],aCols[_nI][_nPosQuant],Val(_cUnit))
 				_cUnit   := Str(Val(_cUnit) + (aIcmsSol[2]/Val(_cQuant)),TamSx3("L2_VRUNIT")[1],TamSx3("L2_VRUNIT")[2])
 				_cTotIt  := Str(Val(_cUnit) * Val(_cQuant),TamSx3("L2_VLRITEM")[1],nDecimais)
@@ -265,8 +272,8 @@ Else
 	//Caso o pais seja diferente de Brasil é necessário incluir todas as moedas      
 	If cPaisLoc <> "BRA"
 		For _nI := 2 To MoedFin()
-			SX5->(MsSeek(xFilial()+"24"+GetMv("MV_SIMB"+Str(_nI,1))))
-			AAdd(aFormPag, {AllTrim(X5Descri()), GetMv("MV_SIMB"+Str(_nI,1)), AllTrim(X5Descri()) })
+			SX5->(MsSeek(xFilial()+"24"+USEMVPAR("MV_SIMB"+Str(_nI,1))))
+			AAdd(aFormPag, {AllTrim(X5Descri()), USEMVPAR("MV_SIMB"+Str(_nI,1)), AllTrim(X5Descri()) })
 		Next _nI
 	EndIf                    
 	aTotForm := Array(Len(aFormPag))
@@ -300,13 +307,13 @@ Else
 		//³tabela 24 do SX5 ou 2, que será do cadastro de administradoras ³
 		//³(SAE).                                                         ³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		If IsMoney(acReceb[_nI][3]) .OR. (Alltrim(acReceb[_nI][3]) $ 'CH,CR') .OR. GetMV("MV_LJPAGTO")==1
+		If IsMoney(acReceb[_nI][3]) .OR. (Alltrim(acReceb[_nI][3]) $ 'CH,CR') .OR. cPar4 == 1
 			nPos := AScan(aFormPag, {|x| Upper(x[2])==Upper(Alltrim(acReceb[_nI][3]))})
 		Else
 			nPos := AScan(aFormPag, {|x| Upper(x[1])==Upper(Alltrim(Subst(acReceb[_nI][4],7,30)))})
 		Endif
 		
-		if Alltrim(acReceb[_nI][3]) $ GetMv('MV_SIMB1')+',VA'
+		if Alltrim(acReceb[_nI][3]) $ cPar5+',VA'
 			aTotForm[nPos] += acReceb[_nI][2] + nTrocoAux
 			nTrocoAux := 0
 		else
@@ -320,7 +327,7 @@ Else
 	sFormaPagto := ''
 	For _nI := 1 to Len(aFormPag)
 		If aTotForm[_nI] > 0
-			sFormaPagto := sFormaPagto + aFormPag[_nI][IIF(GetMV("MV_LJPAGTO")==1,3,1)] + '|' + Alltrim(Str(aTotForm[_nI],14,nDecimais)) + '|'
+			sFormaPagto := sFormaPagto + aFormPag[_nI][IIF(cpar6==1,3,1)] + '|' + Alltrim(Str(aTotForm[_nI],14,nDecimais)) + '|'
 		Endif
 	Next _nI
 	
@@ -415,3 +422,6 @@ Else
 Endif
 
 Return
+
+Static Function USEMVPAR(cParam)
+Return GetMV(cParam)

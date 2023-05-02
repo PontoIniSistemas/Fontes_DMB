@@ -160,6 +160,8 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 	Local nCamTot  := TamSx3("D2_TOTAL")[2]	//casa decimal do campo D2_TOTAL
 	Local lIntegHtl := SuperGetMv("MV_INTHTL",, .F.) //Integracao via Mensagem Unica - Hotelaria
 	Local lUsaColab	:= UsaColaboracao("3") //Utiliza Colaboração.
+
+	Local cPar1 := SuperGetMV("MV_INTTUR",,.F.)
 		
 	Private aUF     	:= {}         
 	Private cMvMsgTrib	:= SuperGetMV("MV_MSGTRIB",,"1")
@@ -940,7 +942,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 							Endif
 						EndIf
 					EndIf
-				ElseIf SuperGetMV("MV_INTTUR",,.F.) .AND. Empty( (cAliasSD2)->D2_PEDIDO )			
+				ElseIf cPar1 .AND. Empty( (cAliasSD2)->D2_PEDIDO )			
 					cMunPrest := SM0->M0_CODMUN
 					cDescMunP := Alltrim(SM0->M0_CIDCOB)	
 				Else
@@ -2399,7 +2401,10 @@ static function servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe
 	Local  aRestImp    := {}	
 	Local   cPercTrib   := "0"
 	Local  lIntegHtl   := SuperGetMv("MV_INTHTL",, .F.) //Integracao via Mensagem Unica - Hotelaria
-	local cCampoDiscDed := alltrim(SuperGetMV("MV_DISCDED",," ")) //Campo do cliente customizado para informar a descricao do valor da Deducao 
+	local cCampoDiscDed := alltrim(SuperGetMV("MV_DISCDED",," ")) //Campo do cliente customizado para informar a descricao do valor da Deducao
+
+	Local cPar1 := GetMV("MV_CMPUSR")
+	Local cPar2 := superGetMV( "MV_NFSTREC",.F.,"" )
 	
 	Default nDescon		:= 0
 	Default cFntCtrb	:= ""
@@ -2651,7 +2656,7 @@ static function servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe
 
 		cString	+= "<codtrib>" + allTrim( aProd[nX][34]) + allTrim( aProd[nX][32] ) + "</codtrib>"		
 
-		If ( SC6->(FieldPos("C6_DESCRI")) > 0 .And. Len(aProd[nX]) > 40 .And. !Empty(aProd[nX][41]) ) .And. (!lNFeDesc .And. !GetNewPar("MV_NFESERV","1") == "1" .And. !Empty(GetMV("MV_CMPUSR")) )
+		If ( SC6->(FieldPos("C6_DESCRI")) > 0 .And. Len(aProd[nX]) > 40 .And. !Empty(aProd[nX][41]) ) .And. (!lNFeDesc .And. !GetNewPar("MV_NFESERV","1") == "1" .And. !Empty(cPar1) )
 			cString	+= "<discr>" + AllTrim(aProd[nX][41])+ cCargaTrb + "</discr>"
 		ElseIf !lNFeDesc
 			cString	+= "<discr>" + AllTrim(cNatOper)+ cCargaTrb + "</discr>"
@@ -2668,7 +2673,7 @@ static function servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe
 		//- Tratamento específico para ISS - São Paulo - Tag Valor Serviços e Valor Total Recebido
 		//- Link Consultoria tributaria: http://tdn.totvs.com/pages/releaseview.action?pageId=382554689
 		//-----------------------------------------------------------------------------------------
-		if( cCodMun == "3550308" .and. allTrim( aProd[ nX ][ 23 ] ) $ allTrim( superGetMV( "MV_NFSTREC",.F.,"" ) ) )
+		if( cCodMun == "3550308" .and. allTrim( aProd[ nX ][ 23 ] ) $ allTrim( cPar2 ) )
 			cString	+= "<valdedu>0.00</valdedu>"//tag valdedu é obrigatória, onde a mesma deve estar com valor 0 ao considerar o "Valor Recebido"
 			cString	+= "<valreceb>" + allTrim( convType( ( aProd[ nX ][ 28 ] ),15,2 ) ) + "</valreceb>"
 		else

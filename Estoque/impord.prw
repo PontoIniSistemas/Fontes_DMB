@@ -411,43 +411,16 @@ MS_FLUSH()
 Static Function ValidPerg(cPerg)
 ********************************
 Local _sAlias := Alias()
-Local aRegs := {}
-Local i,j
-dbSelectArea("SX1")
-dbSetOrder(1)
+Local i
 cPerg := PADR(cPerg,6)
-// Grupo/Ordem/Pergunta/Variavel/Tipo/Tamanho/Decimal/Presel/GSC/Valid/Var01/Def01/Cnt01/Var02/Def02/Cnt02/Var03/Def03/Cnt03/Var04/Def04/Cnt04/Var05/Def05/Cnt05
-aAdd(aRegs,{cPerg,"01","Da OS          ?","","","mv_ch1","C",08,00,0,"G","","mv_par01","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-aAdd(aRegs,{cPerg,"02","Ate OS         ?","","","mv_ch2","C",08,00,0,"G","","mv_par02","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-aAdd(aRegs,{cPerg,"03","OS P/Mecanico  ?","","","mv_ch3","N",01,00,0,"C","","mv_par03","Sim","","","","","Nao","","","","","","","","","","","","","","","","","","","",""}) 
-aAdd(aRegs,{cPerg,"04","Quant. Vias    ?","","","mv_ch4","N",03,00,0,"G","","mv_par04","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-For i:=1 to Len(aRegs)
-    If !dbSeek(cPerg+aRegs[i,2])
-        RecLock("SX1",.T.)
-        For j:=1 to FCount()
-            If j <= Len(aRegs[i])
-                FieldPut(j,aRegs[i,j])
-            Endif
-        Next
-        MsUnlock()
-    Endif
-Next
+
+Pergunte(cPerg,.F.)
 If FunName() # "#IMPORD"
-	For i:=1 to 4
-	  	If aRegs[i,2] == "01" .or. aRegs[i,2] == "02"
-			dbSelectArea("SX1")
-			dbSetOrder(1)
-	  		dbSeek(cPerg+aRegs[i,2])
-   	 	RecLock("SX1",.f.)
-    			X1_CNT01 := VO1->VO1_NUMOSV
-	    	MsUnlock()
+	For i := 1 to 4
+	  	If i <= 2
+				SetMVValue(cPerg,"MV_PAR0"+Str(i),VO1->VO1_NUMOSV)
   		Else
-			dbSelectArea("SX1")
-			dbSetOrder(1)
-  			dbSeek(cPerg+aRegs[i,2])
-	    	RecLock("SX1",.f.)
-   	 		X1_CNT01 := "1"
-    		MsUnlock()
+				SetMVValue(cPerg,"MV_PAR0"+Str(i),"1")
 	  	EndIf
 	Next
 EndIf	

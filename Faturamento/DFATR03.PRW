@@ -1967,14 +1967,15 @@ Local cValid      := ""
 Local cReferencia := ""
 Local nPosIni     := 0
 Local nLen        := 0
+Local aStru 			:= {}
+Local nXi 				:= 0
+
+aStru := FWSX3Util():GetListFieldsStruct("SCK",.T.)
 
 If aFisGet == Nil
 	aFisGet	:= {}
-	dbSelectArea("SX3")
-	dbSetOrder(1)
-	MsSeek("SCK")
-	While !Eof().And.X3_ARQUIVO=="SCK"
-		cValid := UPPER(X3_VALID+X3_VLDUSER)
+	For nXi := 1 to Len(aStru)
+		cValid := UPPER(GETSX3CACHE(aStru[1],"X3_VALID")+GETSX3CACHE(aStru[1],"X3_VLDUSER"))
 		If 'MAFISGET("'$cValid
 			nPosIni 	:= AT('MAFISGET("',cValid)+10
 			nLen		:= AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
@@ -1986,18 +1987,16 @@ If aFisGet == Nil
 			cReferencia	:=Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
 			aAdd(aFisGet,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
 		EndIf
-		dbSkip()
-	EndDo
+	Next nXi
 	aSort(aFisGet,,,{|x,y| x[3]<y[3]})
 EndIf
 
+aStru := FWSX3Util():GetListFieldsStruct("SCJ",.T.)
+
 If aFisGetSCJ == Nil
 	aFisGetSCJ	:= {}
-	dbSelectArea("SX3")
-	dbSetOrder(1)
-	MsSeek("SCJ")
-	While !Eof().And.X3_ARQUIVO=="SCJ"
-		cValid := UPPER(X3_VALID+X3_VLDUSER)
+	For nXi := 1 to Len(aStru)
+		cValid := UPPER(GETSX3CACHE(aStru[1],"X3_VALID")+GETSX3CACHE(aStru[1],"X3_VLDUSER"))
 		If 'MAFISGET("'$cValid
 			nPosIni 	:= AT('MAFISGET("',cValid)+10
 			nLen		:= AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
@@ -2009,9 +2008,9 @@ If aFisGetSCJ == Nil
 			cReferencia	:=Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
 			aAdd(aFisGetSCJ,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
 		EndIf
-		dbSkip()
-	EndDo
+	Next nXi
 	aSort(aFisGetSCJ,,,{|x,y| x[3]<y[3]})
 EndIf
+
 MaFisEnd()
 Return(.T.)

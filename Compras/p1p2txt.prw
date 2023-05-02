@@ -106,6 +106,9 @@ Local cLinha
 Local _cTES
 Local _nAliq
 Local cInscMun := mv_par05
+Local cPar1		:= GetMv("MV_TESSAI")
+Local cPar2		:= GetMv("MV_ALIQISS")
+Local cPar3		:= GetMv("MV_ICMPAD")
 
 Private nHdl
 
@@ -176,7 +179,7 @@ While !SB1->(Eof()) .And. SB1->B1_FILIAL == xFilial("SB1")
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 	//³ Busca Situacao Tributaria   ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	_cTES     := IIF(Empty(SB1->B1_TS),GetMv("MV_TESSAI"),SB1->B1_TS)
+	_cTES     := IIF(Empty(SB1->B1_TS),cPar1,SB1->B1_TS)
 	_cSitTrib := SitTrib(_cTES)
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -192,9 +195,9 @@ While !SB1->(Eof()) .And. SB1->B1_FILIAL == xFilial("SB1")
 		_nAliq := LjIcmsSol(_nVlUnit,1,_nVlUnit)[3]		
 	Else
 		If _cSitTrib == "S"		//Se for servico busca pelo B1_ALIQISS ou MV_ALIQISS
-			_nAliq := IIF(Empty(SB1->B1_ALIQISS),GetMv("MV_ALIQISS"),SB1->B1_ALIQISS)		
+			_nAliq := IIF(Empty(SB1->B1_ALIQISS),cPar2,SB1->B1_ALIQISS)		
 		Else		//caso contrario, busca do B1_PICM ou MV_ICMPAD
-			_nAliq := IIF(Empty(SB1->B1_PICM),GetMv("MV_ICMPAD"),SB1->B1_PICM)				
+			_nAliq := IIF(Empty(SB1->B1_PICM),cPar3,SB1->B1_PICM)				
 		EndIf
 	EndIf
 	_nAliq := StrTran(StrTran(Str(_nAliq,05,2)," ","0"),".","")
@@ -299,6 +302,9 @@ Return(_cRet)
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 */
 Static Function ValidPerg(aRegs,cPerg)
+
+Local j
+Local i
 
 sAlias := Alias()
 DbSelectArea("SX1")

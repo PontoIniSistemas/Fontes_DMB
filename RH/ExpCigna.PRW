@@ -96,6 +96,8 @@ Local _nTipGer:= mv_par04
 Local _cPath  := Substr(mv_par05,1,Rat("\",mv_par05))
 Local _byOrd  := 0
 
+Private oTempTable := Nil
+
 Private _cFile   := _cPath+"FURM"+Soma1(GetMV("MV_NUMFURM"),4)
 Private _cFileDbf := RetArq(__LocalDriver,(_cFile+GetDBExtension()),.T.)
 
@@ -122,11 +124,7 @@ Else
 	//읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
 	_cAlias := Alias()
 	_byOrd	:= IndexOrd()
-	dbSelectArea("SX6")
-	GetMV("MV_NUMFURM")
-	RecLock("SX6",.F.)
-	SX6->X6_CONTEUD := Soma1(GetMV("MV_NUMFURM"),4)
-	MSUnlock()
+	PutMV("MV_NUMFURM",Soma1(GetMV("MV_NUMFURM"),4))
 	dbSelectArea(_cAlias)
 	If _byOrd>0
 		dbSetOrder(_byOrd)
@@ -256,6 +254,7 @@ EndDo
 
 Processa({|| RunCont(_dDatRef) },"Processando...")
 Close(_oGeraTxt)
+oTempTable:Delete()
 Return
 
 /*/
@@ -643,7 +642,8 @@ Static Function Cria_TRB()
 Local _aStruc[26]
 Local _cIndice  := "DESCEND(TIPODADO) + CODACAO + FILIAL + MAT"
 
-If !MSFile(_cFileDbf,,__LocalDriver)
+// If !File(_cFileDbf,,__LocalDriver)
+If !File(_cFileDbf)
 	_aStruc[01] := {"TIPODADO" ,"C",02,0}
 	_aStruc[02] := {"CODACAO"  ,"C",02,0}
 	_aStruc[03] := {"FILIAL"   ,"C",02,0}
@@ -670,12 +670,15 @@ If !MSFile(_cFileDbf,,__LocalDriver)
 	_aStruc[24] := {"DATAFIM"  ,"D",08,0}
 	_aStruc[25] := {"FILIALD"  ,"C",02,0}
 	_aStruc[26] := {"MATD"     ,"C",06,0}
-	
-	dbCreate(_cFileDbf,_aStruc,__LocalDriver)
-	dbUseArea( .T.,__LocalDriver, _cFileDbf, "TRB", If(.F. .OR. .T., !.T., NIL), .F. )
+
+	oTempTable := FWTemporaryTable():New("TRB", _cFileDbf)
+	oTemptable:SetFields(_aStruc)
+	oTempTable:Create()
 	IndRegua("TRB",FileNoExt(_cFileDbf),_cIndice,,,"Selecionando Registros...")
 Else
-	dbUseArea( .T.,__LocalDriver, _cFileDbf, "TRB", If(.F. .OR. .T., !.T., NIL), .F. )
+	oTempTable := FWTemporaryTable():New("TRB", _cFileDbf)
+	oTemptable:SetFields(_aStruc)
+	oTempTable:Create()
 	IndRegua("TRB",FileNoExt(_cFileDbf),_cIndice,,,"Selecionando Registros...")
 EndIf
 

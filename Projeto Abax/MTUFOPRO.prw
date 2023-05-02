@@ -50,13 +50,16 @@ SmartNFe 01/02/2016        Criação de parametros para ser informados usuário e s
                                             
 User Function MTUFOPRO(cEmpAbx, cFilAbx, cIdAbx)   
 	   
-	Local cAlias   := ' '
-  	Local aEmpSmar := {}
-  	Local aEmpNFe  := {}
-  	Local aInfo   := {}
-  	Local aTables := {"SA1","SA2","SF1","SD1","SF2","SD2","CTT","ZNF", "SF4","SB6","SB1","CT1",'SX6'}//seta as tabelas que serão abertas no rpcsetenv
-  	cError      := "" // Tratamento para erros não amigaveis finalizar a tela.
-  	oLastError := ErrorBlock({|e| cError := e:Description + e:ErrorStack})
+	Local cAlias   	:= ' '
+	Local aEmpSmar 	:= {}
+	Local aEmpNFe  	:= {}
+	Local aInfo   	:= {}
+	Local nI      	:= 0
+	Local n
+	Local aTables 	:= {"SA1","SA2","SF1","SD1","SF2","SD2","CTT","ZNF", "SF4","SB6","SB1","CT1",'SX6'}//seta as tabelas que serão abertas no rpcsetenv
+
+	cError      := "" // Tratamento para erros não amigaveis finalizar a tela.
+	oLastError := ErrorBlock({|e| cError := e:Description + e:ErrorStack})
    	
 	If Empty(cIdAbx)
  		//--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
@@ -451,6 +454,10 @@ Static Function FSGeraNFE(cPrefix)
 	Local cLocSB6	:= ''  
 	Local cLocSC7	:= ''  //Declaração Variável.
 
+	Local cPar1		:= SuperGetMV('MA_VENABAX',.F.,.T.)
+	Local cPar2		:= GetMV("MV_DIAISS")
+	Local cPar3		:= SuperGetMV('MA_LOCSB6',.F.,.T.)
+
 	Private  cTpLanc   := ''
 	Private _aCabSF1   		:= {}  
 	Private _aLinha	   		:= {}   
@@ -656,7 +663,7 @@ Static Function FSGeraNFE(cPrefix)
 			cMAVenc	   :=  Alltrim((cPrefix)->ZNF_MAVENC)  //String com alterações do vencimento.
             
          //Caso parametro não exista, será considerado .T. e pegará a data de emissão da nota fiscal.
-			If SuperGetMV('MA_VENABAX',.F.,.T.)  //Se .T. ira considerar data de emissao
+			If cPar1  //Se .T. ira considerar data de emissao
 				dDtVAbax := Stod((cPrefix)->ZNF_EMISSA)
 			Else 
 				dDtVAbax := dDataBase //Se 2 ira considerar data base			
@@ -681,7 +688,7 @@ Static Function FSGeraNFE(cPrefix)
 			//--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
 			If (cPrefix)->ZNF_ESPEC = 'NFSE' // Incluído tratamento de Fornecedor de ISS e Loja ISS
 
-				cDiaIss := Alltrim(GetMV("MV_DIAISS"))
+				cDiaIss := Alltrim(cPar2)
 				cMesIss := alltrim(str(Month(dDataBase)+ 1))
 				cAnoIss := alltrim(str(Year(dDataBase)))       
 				
@@ -888,7 +895,7 @@ Static Function FSGeraNFE(cPrefix)
 			//Aadd(_aLinha,{"D1_LOCAL"  ,cLocSC7					 	 	,Nil})		
 		Else
 			If !Empty(cLocSB6)
-				If SuperGetMV('MA_LOCSB6',.F.,.T.)	                               
+				If cPar3	                               
 					Aadd(_aLinha,{"D1_LOCAL"  ,cLocSB6 						 	,Nil})		
 				Endif	
 			Endif	
@@ -1417,6 +1424,9 @@ Return
 */
 Static Function Abax_SX3()
 
+	Local nAtual
+	Local nX
+
 	aCabAux := {}
 	aIteAux := {}
 	aItetot := {}           
@@ -1464,6 +1474,9 @@ Local aEmpSmar 	:= {}
 Local aEmpNFe  	:= {}
 Local aInfo   	:= {}
 Local aTables 	:= {"SA1","SA2","SF1","SD1","SF2","SD2","CTT","ZNF", "SF4","SB6","SB1","CT1",'SX6'}//seta as tabelas que serão abertas no rpcsetenv
+
+Local nI
+Local n
 
 Private cCondAbax   := Space(3) //Condicao de pagamento   
 Private dDtVAbax	:= date()

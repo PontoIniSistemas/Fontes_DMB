@@ -833,6 +833,8 @@ Local cCfopAnt		:= ""
 Local aItensAux     := {}
 Local aArray		:= {}
 
+Local cPar1 := SuperGetMv("MV_ESTADO")
+
 Default cDtHrRecCab := ""
 Default dDtReceb    := CToD("")
 
@@ -1359,7 +1361,7 @@ For nZ := 1 To nLenDet
 	Endif
 	
 	// Tramento quando houver diferença entre as unidades uCom e uTrib ( SEFAZ MT )
-	If "MT" $ Alltrim( Upper( SuperGetMv("MV_ESTADO") ) ) .And. ( oDet[nX]:_Prod:_uTrib:TEXT <> oDet[nX]:_Prod:_uCom:TEXT )
+	If "MT" $ Alltrim( Upper( cPar1 ) ) .And. ( oDet[nX]:_Prod:_uTrib:TEXT <> oDet[nX]:_Prod:_uCom:TEXT )
 
 	    lPontilhado := IIf( nLenDet > 1, .T., lPontilhado )
     	

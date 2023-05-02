@@ -31,6 +31,7 @@ User Function IMPCIGNA
 Private _cString     := "SRA"
 Private _cPerg       := "IMPCIG"
 Private _oLeTxt
+Private oTempTable  	:= Nil
 
 Pergunte(_cPerg,.F.)
 
@@ -46,7 +47,7 @@ Pergunte(_cPerg,.F.)
 
 @ 70,128 BMPBUTTON TYPE 05 ACTION Pergunte(_cPerg,.T.)
 @ 70,158 BMPBUTTON TYPE 01 ACTION OkLeTxt( oLeTxt )
-@ 70,188 BMPBUTTON TYPE 02 ACTION Close(oLeTxt)
+@ 70,188 BMPBUTTON TYPE 02 ACTION EndTela(oLeTxt)
 
 Activate Dialog oLeTxt Centered
 
@@ -70,7 +71,6 @@ Return
 Static Function OkLeTxt( oLeTxt )
 
 Local aVerba := {}
-
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Variaveis utilizadas na pergunte                                 ³
 //³ mv_par01	// Path origem                                       ³
@@ -109,8 +109,9 @@ aAdd(aVerba,{"VALORIG","N",15,2})
 aAdd(aVerba,{"ALTERA", "C",01,0})
 aAdd(aVerba,{"STATUS", "C",01,0})
 
-cArqVerba := CriaTrab(aVerba, .T.)
-dbUseArea(.T.,,cArqVerba,"VER",.F.)
+oTempTable := FWTemporaryTable():New("VER", cArqVerba)
+oTemptable:SetFields( aVerba )
+oTempTable:Create()
 dbSelectArea("VER")
 Append From (_cFile) Delimited With ";"
 dbGoTop()
@@ -355,3 +356,11 @@ Return
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
 Static Function Transforma(dData)
 Return(StrZero(Day(dData),2)+StrZero(Month(dData),2)+Right(Str(Year(dData)),4))
+
+Static Function EndTela(oLeTxt)
+
+oTempTable:Delete()
+
+Close(oLeTxt)
+
+Return

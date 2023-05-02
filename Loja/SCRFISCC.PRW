@@ -36,6 +36,9 @@ Local cFormRet      := GetPvProfString("Condicao de Pagamento", "Retencoes", "RE
 Local nRestDiv      := 0
 Local lPCCRet       := FindFunction("LJPCCRet")
 
+Local cPar1 := GetMv('MV_SIMB1')
+Local cPar2 := GetMV("MV_LJPAGTO")
+
 If !File( GetClientDir()+"SIGALOJA.INI" )
 	WritePProString("Condicao de Pagamento", "Retencoes", "RETENCOES", GetClientDir()+"SIGALOJA.INI")
 EndIf
@@ -111,13 +114,13 @@ Else
 		//³tabela 24 do SX5 ou 2, que será do cadastro de administradoras ³
 		//³(SAE).                                                         ³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		If Alltrim(_acReceb[i][3]) $ GetMv('MV_SIMB1')+',CH,CR' .or. GetNewPar("MV_LJPAGTO",1)==1
+		If Alltrim(_acReceb[i][3]) $ cPar1+',CH,CR' .or. GetNewPar("MV_LJPAGTO",1)==1
 			nPos := 	AScan(_aFormPag, {|x| Upper(x[2])==Upper(Alltrim(_acReceb[i][3]))})
 		Else
 			nPos := 	AScan(_aFormPag, {|x| Upper(x[1])==Upper(Alltrim(Subst(_acReceb[i][4],7,30)))})
 		Endif
 		
-		if Alltrim(_acReceb[i][3]) $ GetMv('MV_SIMB1')+',VA'
+		if Alltrim(_acReceb[i][3]) $ cPar1+',VA'
 			_aTotForm[nPos] += _acReceb[i][2] + _nTrocoAux
 			_nTrocoAux := 0
 		else
@@ -130,7 +133,7 @@ Else
 	_sFormaPagto := ''
 	For i:=1 to Len(_aFormPag)
 		If _aTotForm[i] > 0
-			_sFormaPagto := _sFormaPagto + _aFormPag[i][IIF(GetMV("MV_LJPAGTO")==1,3,1)] + '|' + Alltrim(Str(_aTotForm[i],14,nDecimais)) + '|'
+			_sFormaPagto := _sFormaPagto + _aFormPag[i][IIF(cPar2==1,3,1)] + '|' + Alltrim(Str(_aTotForm[i],14,nDecimais)) + '|'
 		Endif
 	Next i
 	

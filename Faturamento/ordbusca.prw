@@ -18,6 +18,7 @@ SetPrvt("cAlias , cNomRel , cGPerg , cTitulo , cDesc1 , cDesc2 , cDesc3 , aOrdem
 SetPrvt("titulo,cabec1,cabec2,nLastKey,wnrel,tamanho")
 
 Private aVetCampos := {}
+Private oTempTable := nil
 
 cAlias := "VO3"
 cNomRel:= "ORDBUSCA"
@@ -62,6 +63,8 @@ If aReturn[5] == 1
 EndIf
 MS_FLUSH()
 
+oTempTable:Delete()
+
 Return(Allwaystrue())
 
 /*
@@ -79,7 +82,7 @@ Return(Allwaystrue())
 */
 Static Function FS_IMPORDBUSC()
 
-Local i := 0 
+Local i := 0
 
 SetPrvt("nLin , i , nTotal ")
 SetPrvt("cbTxt , cbCont , cString , Li , m_Pag , wnRel , cTitulo , cabec1 , cabec2 , nomeprog , tamanho , nCaracter ")
@@ -96,8 +99,9 @@ aadd(aVetCampos,{ "TRB_PROREQ" , "C",  6 , 0 })  && REQUISITANTE
 aadd(aVetCampos,{ "TRB_QTDDIS" , "N",  8 , 2 })  && QTD. DISPONIVEL
 aadd(aVetCampos,{ "TRB_CHAINT" , "C",  6 , 0 })  && CHASSI INTERNO
 
-cArqTra := CriaTrab(aVetCampos, .T.)
-DbUseArea( .T.,, cArqTra, "TRB", Nil, .F. )
+oTempTable := FWTemporaryTable():New("TRB", cArqTra)
+oTemptable:SetFields( aVetCampos )
+oTempTable:Create()
 
 DbSelectArea("TRB")
 cArqInd1 := CriaTrab(NIL, .F.)

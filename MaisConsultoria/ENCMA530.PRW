@@ -117,6 +117,8 @@ Local cVendedor := ""
 Local lGravouC7 := .F.
 Local cCodProdu := AllTrim(GetNewPar("MC_PRDCOMI","SV000000000005"))
 Local cCondPaga := AllTrim(GetNewPar("MC_CNDCOMI","001"))
+Local cCodUsr		:= RetCodUsr()
+Local nXi
 
 Private lMsHelpAuto := .F.
 Private lMsErroAuto := .F.
@@ -171,7 +173,7 @@ For nXi:= 1 To Len(aDadosPed)
 		              {"C7_LOCAL"       ,"01"               ,Nil},;    	                 
 		              {"C7_OBS"         ,cObservac          ,Nil},; 	                  
 		              {"C7_CONAPRO"     ,"L"                ,Nil},; 		              
-		              {"C7_USER"        ,RetCodUsr()        ,Nil},; 
+		              {"C7_USER"        ,cCodUsr        		,Nil},; 
 		              {"C7_FLUXO"       ,"S"                ,Nil},;		              		              		              
 		              {"C7_DATPRF"      ,dDataBase          ,Nil}}                  
 		 
@@ -234,7 +236,7 @@ For nXi:= 1 To Len(aDadosPed)
 			Replace C7_OBS      With cObservac       
 			Replace C7_DATPRF   With dDataBase       
 			Replace C7_CONAPRO  With "L" 
-			Replace C7_USER     With RetCodUsr()
+			Replace C7_USER     With cCodUsr
 			Replace C7_FLUXO    With "S"  
 			SC7->(MsUnLock())
 			lGravouC7 := .T.

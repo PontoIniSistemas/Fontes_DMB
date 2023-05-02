@@ -19,6 +19,8 @@ Local aFormPag := {}
 Local aTotForm := {} // array com os totais a pagar
 Local sFormaPagto := ''
 Local nTrocoAux := ParamIXB[1]
+Local i
+Local cPar1 := GetMv('MV_SIMB1')
 
 // array com as formas de pagamento que estao cadastradas no ECF
 // devera ser alterada conforme a necessidade do cliente
@@ -38,7 +40,7 @@ For i := 1 To Len(aParcelas)
 
 	nPos := 	AScan(aFormPag, {|x| Upper(x[2])==Upper(Alltrim(aParcelas[i][3]))})
 
-	if aParcelas[i][3] $ GetMv('MV_SIMB1')+',VA'
+	if aParcelas[i][3] $ cPar1+',VA'
 		aTotForm[nPos] += aParcelas[i][2] + nTrocoAux
 		nTrocoAux := 0
 	else
