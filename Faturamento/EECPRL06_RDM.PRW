@@ -45,6 +45,7 @@ Local aArqs
 Local cNomDbfC, aCamposC, cNomDbfD, aCamposD
 Local aRetCrw, lZero := .t.
 Local cPeriodo
+Local cPar1 := GetMv("MV_AVG0005")
 
 Private dDtIni   := AVCTOD("  /  /  ")
 Private dDtFim   := AVCTOD("  /  /  ")
@@ -188,7 +189,7 @@ Begin Sequence
       DET->AGDEST  := BUSCAEMPRESA(EEC->EEC_PREEMB,OC_EM,CD_ARM)
       
       IF Empty(EEC->EEC_EMBAFI) .Or.;
-           GetMv("MV_AVG0005") // Deixar de gravar embalagens ? 
+           cPar1 // Deixar de gravar embalagens ? 
          nCubagem := EEC->EEC_CUBAGE
       Else
          nCubagem := EEC->EEC_CUBAGE*EEC->EEC_TOTVOL

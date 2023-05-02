@@ -140,6 +140,7 @@ Return
 Static FUNCTION PO551Cab()
 *--------------------------*
 Local I
+Local cPar1 := Getmv("MV_ID_CLI")
 Linha:=0
 limite:=130
 nProc:=100
@@ -191,7 +192,7 @@ oPrn:SetPortrait()
          EndIf
 
          SA2->(DBSEEK(xFilial()+SW2->W2_FORN))
-         IF Getmv("MV_ID_CLI") $ cSim
+         IF cPar1 $ cSim
             SA1->(DBSEEK(xFilial("SA1")+SW2->W2_CLIENTE))
          ELSE
             SY1->(DBSEEK(xFilial("SY1")+SW2->W2_COMPRA))

@@ -260,6 +260,8 @@ Local nDespTot := FATCVLDESP(),;
 
 Local aOrd := SaveOrd({"EE8"})
 
+Local cPar1 := GetMV("MV_ARREFAT")
+
 MsProcTxt(STR0016) //"Em Processamento ..."
 // aCab por dimensao:
 // aCab[n][1] := Nome do Campo
@@ -362,7 +364,7 @@ Begin Sequence
       EndIf
       nValorIt := nFator*nDespTot                         // CALCULA O VALOR EM DOLAR DO PRODUTO
       nDesp    := nDesp+nValorIt                          // TOTAL DAS DESPESAS EM DOLAR
-      If ( GetMV("MV_ARREFAT")=="S" )      
+      If ( cPar1 == "S" )      
          nVALORIT := ROUND(nVALORIT,AVSX3("C6_VALOR",AV_DECIMAL))
       Else
          nVALORIT := NOROUND(nVALORIT,AVSX3("C6_VALOR",AV_DECIMAL))
@@ -473,6 +475,8 @@ Local nTxEmb := BuscaTaxa(EEC->EEC_MOEDA,M->EEC_DTEMBA),;
 
 Local aOrd := SaveOrd({"EE8"})
 
+Local cPar1 := GetMV("MV_ARREFAT")
+
 MsProcTxt(STR0016) //"Em Processamento ..."
 // aCab por dimensao:
 // aCab[n][1] := Nome do Campo
@@ -579,7 +583,7 @@ Begin Sequence
          
          lTEVEVAR := .T. // By JPP - 08/07/2005 - 10:50
          
-         If ( GetMV("MV_ARREFAT")=="S" )      
+         If ( cPar1 == "S" )      
             nVALORIT := ROUND(nVALORIT,AVSX3("C6_VALOR",AV_DECIMAL))
          Else
             nVALORIT := NOROUND(nVALORIT,AVSX3("C6_VALOR",AV_DECIMAL))

@@ -754,15 +754,15 @@ If cTipo == "1"
 			If Len(aSX5Data) > 0 
 				If !lNFeDesc  .And. nCont == 1
 					If  cCodmun == "3300704-3156700"
-						cNatOper := If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[4],1,55))),AllTrim(SubStr(aSX5Data[4],1,55))) + cNatOper
+						cNatOper := If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[1][4],1,55))),AllTrim(SubStr(aSX5Data[1][4],1,55))) + cNatOper
 	    			Else
-						cNatOper += If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[4],1,55))),AllTrim(SubStr(aSX5Data[4],1,55)))    			
+						cNatOper += If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[1][4],1,55))),AllTrim(SubStr(aSX5Data[1][4],1,55)))    			
 	    			EndIf
 	    	    ElseIf nCont == 1 
 	    	        If cCodmun == "3300704-3156700"
-						cDescrNFSe := If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[4],1,55))),AllTrim(SubStr(aSX5Data[4],1,55))) + cNatOper
+						cDescrNFSe := If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[1][4],1,55))),AllTrim(SubStr(aSX5Data[1][4],1,55))) + cNatOper
 	    			Else
-						cDescrNFSe := If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[4],1,55))),AllTrim(SubStr(aSX5Data[4],1,55)))    			
+						cDescrNFSe := If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSX5Data[1][4],1,55))),AllTrim(SubStr(aSX5Data[1][4],1,55)))    			
 	    			EndIf
 	    	    EndIf 
     		EndIf
@@ -1259,9 +1259,9 @@ Else
 				
 				If Len(aSx5Data) > 0
 					If cCodmun == "3300704-3156700"
-						cNatOper :=If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSx5Data[4],1,55))),AllTrim(SubStr(aSx5Data[4],1,55))) + cNatOper
+						cNatOper :=If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSx5Data[1][4],1,55))),AllTrim(SubStr(aSx5Data[1][4],1,55))) + cNatOper
 					Else
-						cNatOper += If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSx5Data[4],1,55))),AllTrim(SubStr(aSx5Data[4],1,55)))
+						cNatOper += If(FindFunction('CleanSpecChar'),CleanSpecChar(AllTrim(SubStr(aSx5Data[1][4],1,55))),AllTrim(SubStr(aSx5Data[1][4],1,55)))
                     EndIf
 	    		EndIf 
 				//旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커

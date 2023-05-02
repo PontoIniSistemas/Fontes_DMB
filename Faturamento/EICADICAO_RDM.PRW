@@ -410,6 +410,7 @@ Static Function AdicaoWorkGrv(lAutomatico,lLimpa)//AWR - 11/09/08 - NF-Eletronic
 *=======================================================*
 LOCAL W
 Local lIsAllEmpty := isAllEmpty()
+Local cPar1 := GetMv("MV_NR_ISUF",,80)
 DbSelectArea('SW8')
 nTot:=(cAliasItensSW8)->(LASTREC())
 ProcRegua(nTot)
@@ -434,7 +435,7 @@ DO WHILE (cAliasItensSW8)->(!EOF())
    nCount++
    IncProc("Lendo: "+STR(nCount)+" / "+cTot)
 
-   IF !lLimpa .And. (!WorkCap_SW8->(DBSEEK( (cAliasItensSW8)->(&(cIndice) ) )) .or. nContaItem >= GetMv("MV_NR_ISUF",,80))
+   IF !lLimpa .And. (!WorkCap_SW8->(DBSEEK( (cAliasItensSW8)->(&(cIndice) ) )) .or. nContaItem >= cPar1 )
       nContaAdic++
       WorkCap_SW8->(DBAppend())
       AVREPLACE(cAliasItensSW8,"WorkCap_SW8")

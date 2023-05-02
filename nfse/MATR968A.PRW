@@ -214,8 +214,11 @@ Local oFontA18	:= TFont():New("Arial",18,18,,.F.,,,,.T.,.F.)	//Normal s/negrito
 Local oFontA18n := TFont():New("Arial",18,18,,.T.,,,,.T.,.F.)	//Negrito
 Local oFontA20  := TFont():New("Arial",20,20,,.F.,,,,.T.,.F.)	//Normal s/negrito
 Local oFontA20n := TFont():New("Arial",20,20,,.T.,,,,.T.,.F.)	//Negrito
-
-                                               
+Local cPar1			:= SuperGetMv("MV_TXPIS"  )
+Local cPar2			:= SuperGetMv("MV_TXCOFIN")
+Local cPar3			:= SuperGetMV("MV_ALIQIRF")
+Local cPar4			:= SuperGetMv("MV_TXCSLL" )
+                                              
 #IFDEF TOP
 	Local cQuery    := "" 
 #ELSE 
@@ -539,17 +542,17 @@ If lSorocaba
 				EndDo				
 				SED->(dbSetOrder(1))
 				If SED->(dbSeek(xFilial("SDE")+cNatureza))
-					nAliqPis  := Iif( nValPis  > 0 , Iif( SED->ED_PERCPIS > 0 , SED->ED_PERCPIS , SuperGetMv("MV_TXPIS"  )) , 0 )
-					nAliqCof  := Iif( nValCof  > 0 , Iif( SED->ED_PERCCOF > 0 , SED->ED_PERCCOF , SuperGetMv("MV_TXCOFIN")) , 0 )
+					nAliqPis  := Iif( nValPis  > 0 , Iif( SED->ED_PERCPIS > 0 , SED->ED_PERCPIS , cPar1) , 0 )
+					nAliqCof  := Iif( nValCof  > 0 , Iif( SED->ED_PERCCOF > 0 , SED->ED_PERCCOF , cPar2) , 0 )
 					nALiqINSS := Iif( nValINSS > 0 , SED->ED_PERCINS , 0 )
-					nAliqIR   := Iif( nValIR   > 0 , Iif( SED->ED_PERCIRF > 0 , SED->ED_PERCIRF , SuperGetMV("MV_ALIQIRF")) , 0 )
-					nALiqCSLL := Iif( nValCSLL > 0 , Iif( SED->ED_PERCCSL > 0 , SED->ED_PERCCSL , SuperGetMv("MV_TXCSLL" )) , 0 )
+					nAliqIR   := Iif( nValIR   > 0 , Iif( SED->ED_PERCIRF > 0 , SED->ED_PERCIRF , cPar3) , 0 )
+					nALiqCSLL := Iif( nValCSLL > 0 , Iif( SED->ED_PERCCSL > 0 , SED->ED_PERCCSL , cPar4) , 0 )
 				EndIf
          Else
-				nAliqPis  := Iif( nValPis  > 0 , SuperGetMv("MV_TXPIS"  ) , 0 )
-				nAliqCof  := Iif( nValCof  > 0 , SuperGetMv("MV_TXCOFIN") , 0 )
-				nAliqIR   := Iif( nValIR   > 0 , SuperGetMV("MV_ALIQIRF") , 0 )
-				nALiqCSLL := Iif( nValCSLL > 0 , SuperGetMv("MV_TXCSLL" ) , 0 )
+				nAliqPis  := Iif( nValPis  > 0 , cPar1 , 0 )
+				nAliqCof  := Iif( nValCof  > 0 , cPar2 , 0 )
+				nAliqIR   := Iif( nValIR   > 0 , cPar3 , 0 )
+				nALiqCSLL := Iif( nValCSLL > 0 , cPar4 , 0 )
 			EndIf
 
          aItensSD2 := {}

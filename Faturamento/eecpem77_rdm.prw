@@ -222,6 +222,7 @@ Local nPos,;
       nPrecoTot  := 0,;
       nQuantidade:= 0
 Local lRet:= .F.
+Local cPar1 := GetMv("MV_AVG0174",, .F.)
                   
 EE9->(DBSetOrder(3)) //EE9_FILIAL + EE9_PREEMB + EE9_SEQEMB
 SD1->(DBSetOrder(2)) //D1_FILIAL + D1_COD + D1_DOC + D1_SERIE + D1_FORNECE + D1_LOJA
@@ -311,7 +312,7 @@ Begin Sequence
         Caso o cliente não use a integração com o faturamento e a rotina de notas fiscais de remessa,
         estas informações poderão ser digitadas antes da impressão do relatório. */
 
-      If IsIntFat() .And. GetMv("MV_AVG0174",, .F.)
+      If IsIntFat() .And. cPar1
 
          //Redefine os valores iniciais
          nQuantidade:= 0

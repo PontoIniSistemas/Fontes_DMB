@@ -319,6 +319,8 @@ Local lChave     :=.F.
 Local cChCupom   := ""
 Local cChave     := ""
 
+Local cPar1 := SuperGetMV("MV_ESTADO")
+
 Local nCountNF		:= 0
 Local aItemCupRef	:= {}									// Array para itens dos cupons vinculados na nota sobre cupom
 Local aCupRefLoj	:= {}									// Array para buscar cupons relacionados na nota sobre cupom(quando e utilizado a rotina de multiplos cupons na nota sobre cupom)
@@ -1423,7 +1425,7 @@ If cTipo == "1"
 						MsSeek(xFilial("SF4")+cD2Tes)
 						
 						//Tratamento para atender o DECRETO Nº 35.679, de 13 de Outubro de 2010 - Pernambuco para o Ramo de Auto Peças
-						If lCpoCusEnt .And. SuperGetMV("MV_ESTADO") == "PE" .And. SF4->F4_CUSENTR =="1"
+						If lCpoCusEnt .And. cPar1 == "PE" .And. SF4->F4_CUSENTR =="1"
 							lCustoEntr := .T.
 						EndIf
 	

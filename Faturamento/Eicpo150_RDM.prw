@@ -296,6 +296,7 @@ Return .T.
 Static Function PO150Det()
 *--------------------------*
 Local nMarcados
+Local cPar1 := GetMv("MV_ID_CLI")
 ProcRegua(Len(aMarcados))  //LRL 11/02/04 - ProcRegua(nMarcados))
 
 For nMarcados:=1 To Len(aMarcados)
@@ -339,7 +340,7 @@ For nMarcados:=1 To Len(aMarcados)
       SW3->(dbSkip())
    Enddo //loop dos itens SW3
 
-   cCliComp:=IF(GetMv("MV_ID_CLI")='S',SA1->A1_NOME,SY1->Y1_NOME)
+   cCliComp:=IF(cPar1 == 'S',SA1->A1_NOME,SY1->Y1_NOME)
    PO150Remarks()
    PO150Totais()
 

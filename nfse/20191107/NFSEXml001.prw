@@ -477,7 +477,7 @@ If cTipo == "1"
 				EndIf
 			Else	
 				If Empty(cNatOper)
-					cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[4],1,55))
+					cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[1][4],1,55))
     			EndIf
     		EndIf 
 			//旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
@@ -953,7 +953,7 @@ Else
 					EndIf
 				Else
 					If Empty(cNatOper)
-						cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[4],1,55))
+						cNatOper := AllTrim(SubStr(FWGetSX5("13", xFilial("SX5")+"13"+SF4->F4_CF)[1][4],1,55))
 	    			EndIf
 	    		EndIf
 				//旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커

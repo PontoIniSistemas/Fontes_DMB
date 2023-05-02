@@ -138,6 +138,8 @@ Static FUNCTION EDI160Relatorio()
 LOCAL nTotal := 0, i, W
 LOCAL nPos, nInc   //TRP-10/10/07
 LOCAL aMoedas := {} //TRP-10/10/07
+Local aSx5Data := {}
+Local nX
 
 aPo       := {}
 cRef      := ""
@@ -453,18 +455,14 @@ AVPRINT oPrn NAME STR0007 //"InstruþÒo de Despacho"
         
         IncProc(STR0008) //"Imprimindo..."
 
-        //-----> Tabelas.
-        SX5->( DbSetOrder( 1 ) )
-        SX5->( DbSeek( xFilial()+"Y2" ) )
+        aSx5Data := FWGetSX5("Y2", xFilial()+"Y2" )
         DI160VerFim(0)
         oPrn:Say( Linha:=Linha+90 , 50  ,STR0011,aFontes:TIMES_NEW_ROMAN_12 ) //"LEGENDA DE REGIME: "
-        Do While ! SX5->(Eof()) .AND. SX5->X5_TABELA=="Y2" .AND. ;
-                                      SX5->X5_FILIAL==xFilial("SX5")
+        For nX := 1 To Len(aSx5Data)
            DI160VerFim(0)
-           oPrn:Say( Linha ,590 ,SX5->X5_CHAVE + " - " + X5DESCRI(),aFontes:TIMES_NEW_ROMAN_12)
+           oPrn:Say( Linha ,590 ,aSx5Data[nX][3] + " - " + aSx5Data[nX][4],aFontes:TIMES_NEW_ROMAN_12)
            Linha:=Linha+50
-           SX5->(DBSKIP())
-        Enddo
+        Next nX
         IncProc(STR0008) //"Imprimindo..."
 
         //-----> Importador.
