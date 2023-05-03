@@ -20,9 +20,9 @@ Local aItens 	:= {}
 PRIVATE lMsErroAuto := .F.
 PRIVATE cEmpImp     := "99", cFilImp := "01"
  
-ConOut("****************************************")
-ConOut("**         Preparando ambiente        **")
-ConOut("****************************************")
+SENDLOG("****************************************")
+SENDLOG("**         Preparando ambiente        **")
+SENDLOG("****************************************")
 
 PREPARE ENVIRONMENT EMPRESA cEmpImp FILIAL cFilImp
 
@@ -68,14 +68,14 @@ Aadd(aItens,	{	{"CTQ_FILIAL"	,xFilial("CTQ")	,	NIL},;		//	Codigo da Filial
 						{"CTQ_CLCPAR"	,"1"					,	NIL},;		// Classe de Valor de Contra Partida
 						{"CTQ_PERCEN"	,55.00				,	NIL}	}	)	//	Percentual de Rateio
 
-ConOut("**    Inicio - Inclusao de Rateio Off Line - Automatico    **")
+SENDLOG("**    Inicio - Inclusao de Rateio Off Line - Automatico    **")
 
 //
 // Para identificar que é uma INCLUSAO, passar o numero 3 (três) no ultimo parametro
 //
 MSExecAuto( {|X,Y,Z| CTBA270(X,Y,Z)},aCab,aItens,3)
 
-ConOut("**      Fim - Inclusao de Rateio Off Line - Automatico     **")
+SENDLOG("**      Fim - Inclusao de Rateio Off Line - Automatico     **")
 
 If !lMsErroAuto
 	MsgInfo("Concluido com Sucesso!")
@@ -100,9 +100,9 @@ Local aCab, aItens
 PRIVATE lMsErroAuto := .F.
 PRIVATE cEmpImp     := "99", cFilImp := "01"
  
-ConOut("****************************************")
-ConOut("**         Preparando ambiente        **")
-ConOut("****************************************")
+SENDLOG("****************************************")
+SENDLOG("**         Preparando ambiente        **")
+SENDLOG("****************************************")
 
 PREPARE ENVIRONMENT EMPRESA cEmpImp FILIAL cFilImp 
 
@@ -121,14 +121,14 @@ aCab	:=	{	{"CCTQ_RATEIO"	,"1     ",	NIL} }	//	Codigo do Rateio
 aItens := {}
 
 
-ConOut("**    Inicio - Exclusao de Rateio Off Line - Automatico    **")
+SENDLOG("**    Inicio - Exclusao de Rateio Off Line - Automatico    **")
                                                     
 //
 // Para identificar que é uma EXCLUSÃO, passar o numero 5 (cinco) no ultimo parametro
 //
 MSExecAuto( {|X,Y,Z| CTBA270(X,Y,Z)},aCab,aItens,5)
 
-ConOut("**      Fim - Exclusao de Rateio Off Line - Automatico     **")
+SENDLOG("**      Fim - Exclusao de Rateio Off Line - Automatico     **")
 
 If !lMsErroAuto
 	MsgInfo("Concluido com Sucesso!")
@@ -139,4 +139,22 @@ EndIf
 
 RESET ENVIRONMENT
 
+Return
+
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} LOG
+Retorna o log de um documento
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
+
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
+
+Static Function SENDLOG(cMsg)
+FWLogMsg("INFO",,"LOG",,,,cMsg,,,)
 Return

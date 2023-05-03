@@ -106,6 +106,8 @@ Local lRet:=.t., aOrd:=SaveOrd({"SY5","SA2"})
 Local lFound := .t.  
 Local lFirst := .t.
 Local nCod:= 1
+Local aContSX5 := FWGetSX5("12")
+Local nX
 
 Begin Sequence 
    
@@ -200,13 +202,12 @@ Begin Sequence
                   SX5->(DBSeek(xFilial("SX5")+"12"))
                   SA2->A2_EST := "."
               
-                  While !SX5->(EOF()) .AND. SX5->X5_TABELA == "12"
-                     if SY5->Y5_EST $ SX5->X5_DESCRI
-                        SA2->A2_EST := SX5->X5_CHAVE
+                  For nX := 1 to Len(aContSX5)
+                     if SY5->Y5_EST $ aContSX5[nX][4]
+                        SA2->A2_EST := aContSX5[nX][3]
                         Exit
                      EndIf
-                     SX5->(DBSkip())
-                  enddo
+                  Next nX
                
                   SA2->A2_TIPO    := "J"
                   SA2->A2_ID_FBFN := "2-FORN"  

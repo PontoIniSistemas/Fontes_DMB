@@ -449,13 +449,13 @@ DO CASE
               nInd:=1
               cVar1 := 'M->JD_ATE'+AllTrim(Str(nInd))
               cVar2 := 'M->JD_VAL'+AllTrim(Str(nInd))
-              Do While Type('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
-                       Type('M->JD_VAL'+AllTrim(Str(nInd))) <> "U"  
+              Do While CALLTYPE('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
+                       CALLTYPE('M->JD_VAL'+AllTrim(Str(nInd))) <> "U"  
 
-                 If Type('Work->JD_ATE'+AllTrim(Str(nInd))) <> "U" 
+                 If CALLTYPE('Work->JD_ATE'+AllTrim(Str(nInd))) <> "U" 
                     &cVar1  := &('Work->JD_ATE'+AllTrim(Str(nInd)))
                  Endif
-                 If Type('Work->JD_VAL'+AllTrim(Str(nInd))) <> "U" 
+                 If CALLTYPE('Work->JD_VAL'+AllTrim(Str(nInd))) <> "U" 
                     &cVar2  := &('Work->JD_VAL'+AllTrim(Str(nInd)))
                  Endif
                  nInd++
@@ -469,13 +469,13 @@ DO CASE
               nInd:=1
               cVar1 := 'M->JD_ATE'+AllTrim(Str(nInd))
               cVar2 := 'M->JD_VAL'+AllTrim(Str(nInd))
-              Do While Type('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
-                       Type('M->JD_VAL'+AllTrim(Str(nInd))) <> "U"  
+              Do While CALLTYPE('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
+                       CALLTYPE('M->JD_VAL'+AllTrim(Str(nInd))) <> "U"  
 
-                 If Type('EIE->EIE_ATE'+AllTrim(Str(nInd))) <> "U" 
+                 If CALLTYPE('EIE->EIE_ATE'+AllTrim(Str(nInd))) <> "U" 
                     &cVar1  := &('EIE->EIE_ATE'+AllTrim(Str(nInd)))
                  Endif
-                 If Type('EIE->EIE_VAL'+AllTrim(Str(nInd))) <> "U" 
+                 If CALLTYPE('EIE->EIE_VAL'+AllTrim(Str(nInd))) <> "U" 
                     &cVar2  := &('EIE->EIE_VAL'+AllTrim(Str(nInd)))
                  Endif                   
                  nInd++
@@ -489,8 +489,8 @@ DO CASE
               nInd:=1
               cVar1 := 'M->JD_ATE'+AllTrim(Str(nInd))
               cVar2 := 'M->JD_VAL'+AllTrim(Str(nInd))
-              Do While Type('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
-                       Type('M->JD_VAL'+AllTrim(Str(nInd))) <> "U"  
+              Do While CALLTYPE('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
+                       CALLTYPE('M->JD_VAL'+AllTrim(Str(nInd))) <> "U"  
                   &cVar1  := 0
                   &cVar2  := 0
                   nInd++
@@ -924,8 +924,8 @@ If lRet
     nSaldoDias := 0
     nSaldoAnt  := 0 
       
-    Do While Type('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
-             Type('M->JD_VAL'+AllTrim(Str(nInd))) <> "U" .And. nDias >= nSaldoDias                              
+    Do While CALLTYPE('M->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
+             CALLTYPE('M->JD_VAL'+AllTrim(Str(nInd))) <> "U" .And. nDias >= nSaldoDias                              
 
        If nInd = 1
           nSaldoDias += &cVar1   
@@ -1002,3 +1002,20 @@ If !Empty(cArmador)
 	oArmNome:Refresh()         
 Endif	
 Return .t.
+
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} CALLTYPE
+Chama função CALLTYPE()
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
+
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
+
+Static Function CALLTYPE(cPar)
+Return Type(cPar)

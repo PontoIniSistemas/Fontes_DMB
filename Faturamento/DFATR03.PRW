@@ -1980,12 +1980,12 @@ If aFisGet == Nil
 			nPosIni 	:= AT('MAFISGET("',cValid)+10
 			nLen		:= AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
 			cReferencia := Substr(cValid,nPosIni,nLen)
-			aAdd(aFisGet,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+			aAdd(aFisGet,{cReferencia,GETSX3CACHE(aStru[1],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 		EndIf
 		If 'MAFISREF("'$cValid
 			nPosIni		:= AT('MAFISREF("',cValid) + 10
 			cReferencia	:=Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
-			aAdd(aFisGet,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+			aAdd(aFisGet,{cReferencia,GETSX3CACHE(aStru[1],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 		EndIf
 	Next nXi
 	aSort(aFisGet,,,{|x,y| x[3]<y[3]})
@@ -2001,12 +2001,12 @@ If aFisGetSCJ == Nil
 			nPosIni 	:= AT('MAFISGET("',cValid)+10
 			nLen		:= AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
 			cReferencia := Substr(cValid,nPosIni,nLen)
-			aAdd(aFisGetSCJ,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+			aAdd(aFisGetSCJ,{cReferencia,GETSX3CACHE(aStru[1],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 		EndIf
 		If 'MAFISREF("'$cValid
 			nPosIni		:= AT('MAFISREF("',cValid) + 10
 			cReferencia	:=Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
-			aAdd(aFisGetSCJ,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+			aAdd(aFisGetSCJ,{cReferencia,GETSX3CACHE(aStru[1],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 		EndIf
 	Next nXi
 	aSort(aFisGetSCJ,,,{|x,y| x[3]<y[3]})

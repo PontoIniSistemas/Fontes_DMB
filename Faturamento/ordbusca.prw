@@ -99,7 +99,7 @@ aadd(aVetCampos,{ "TRB_PROREQ" , "C",  6 , 0 })  && REQUISITANTE
 aadd(aVetCampos,{ "TRB_QTDDIS" , "N",  8 , 2 })  && QTD. DISPONIVEL
 aadd(aVetCampos,{ "TRB_CHAINT" , "C",  6 , 0 })  && CHASSI INTERNO
 
-oTempTable := FWTemporaryTable():New("TRB", cArqTra)
+oTempTable := FWTemporaryTable():New("TRB")
 oTemptable:SetFields( aVetCampos )
 oTempTable:Create()
 

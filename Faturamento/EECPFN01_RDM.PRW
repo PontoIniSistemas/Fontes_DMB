@@ -29,13 +29,15 @@ LOCAL nTipo := nil , dDataIni := nil , dDataFim := nil, mv_ch1 := 1
 
 LOCAL bWhile := {|| .t.}
 
+Local lPergunte1 := Pergunte("FW0003",.T.)
+
 
 cSeqRel := nil
 
 While .T.
    mv_ch1 := 1
       
-   IF ! Pergunte("FW0003",.T.)
+   IF !lPergunte1
       Exit
    Endif
    

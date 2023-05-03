@@ -90,26 +90,6 @@ cProcesso:= SPACE(Len(SW6->W6_HAWB))
 lInverte := .F.
 cMarca   := GetMark()
 
-// AWR - 15/7/4   \/\/\/\/\/\/\/
-SX3->(DBSETORDER(2))
-IF SX3->(DBSEEK("WV_FORN")) .AND. SX3->X3_PROPRI == "U"
-   SX3->(RECLOCK("SX3",.F.))
-   SX3->X3_PROPRI := "S"
-   SX3->(MSUNLOCK())
-ENDIF
-IF SX3->(DBSEEK("WV_POSICAO")) .AND. SX3->X3_PROPRI == "U"
-   SX3->(RECLOCK("SX3",.F.))
-   SX3->X3_PROPRI := "S"
-   SX3->(MSUNLOCK())
-ENDIF
-IF SX3->(DBSEEK("WV_INVOICE")) .AND. SX3->X3_PROPRI == "U"
-   SX3->(RECLOCK("SX3",.F.))
-   SX3->X3_PROPRI := "S"
-   SX3->(MSUNLOCK())
-ENDIF
-SX3->(DBSETORDER(1))
-// AWR - 15/7/4   /\/\/\/\/\/\/\
-
 aCampos  := IF(nAnuente == 1 ,Array(SW5->(FCount())),Array(SW5->(FCount())))
 aHeader  := {}
 aSemSX3:={{"FLAG" ,"L",1,0}}

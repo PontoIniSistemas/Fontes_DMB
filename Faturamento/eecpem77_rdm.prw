@@ -61,6 +61,9 @@ Private dDtMemExp,;
 
 //Variáveis requeridas pela MsGetDb
 Private aRotina, aCols:= {}, aHeader:= {}, lRefresh
+
+Private oTmpTable1, oTmpTable2, oTmpTable3, oTmpTable4, oTmpTable5
+
 aRotina:={{"Pesquisar" , "AxPesqui", 0, 1},;
           {"Visualizar", "AxVisual", 0, 2},;
           {"Incluir"   , "AxInclui", 0, 3},;
@@ -127,6 +130,13 @@ Begin Sequence
 End Sequence
 
 RestOrd(aOrd)
+
+oTmpTable1:Delete()
+oTmpTable2:Delete()
+oTmpTable3:Delete()
+oTmpTable4:Delete()
+oTmpTable5:Delete()
+
 Return .F.
 
 
@@ -1234,12 +1244,14 @@ Begin Sequence
                  {"WK_DTRE"  , "D", AvSx3("EE9_DTRE" , AV_TAMANHO), 0},;
                  {"WK_FLAG"  , "L", 1                             , 0}}
 
-   cArq:= CriaTrab(aEstrutura, .T.)
    cAlias:= "Work1"
-   DBUseArea(.T., __LocalDriver, cArq, cAlias, .T., .F.)
+
+   oTempTable1 := FWTemporaryTable():New(cAlias)
+   oTemptable1:SetFields( aEstrutura )
+   oTempTable1:Create()
 
    //Armazena os arquivos criados para exclusão
-   AAdd(aArq, {cAlias, cArq})
+   // AAdd(aArq, {cAlias, cArq})
 
    //Alimenta a Work
    For nCont:= 2 To Len(aProdutos[nFabr])
@@ -1264,12 +1276,14 @@ Begin Sequence
                  {"WK_DTNFREX", "D", AvSx3("D1_EMISSAO", AV_TAMANHO), 0},;
                  {"WK_FLAG"   , "L", 1                              , 0}}
 
-   cArq:= CriaTrab(aEstrutura, .T.)
    cAlias:= "Work4"
-   DBUseArea(.T., __LocalDriver, cArq, cAlias, .T., .F.)
+
+   oTempTable2 := FWTemporaryTable():New(cAlias)
+   oTemptable2:SetFields( aEstrutura )
+   oTempTable2:Create()
 
    //Armazena os arquivos criados para exclusão
-   AAdd(aArq, {cAlias, cArq})
+   // AAdd(aArq, {cAlias, cArq})
 
    //Alimenta a Work
    For nCont:= 1 To Len(aNotasExp)
@@ -1296,12 +1310,14 @@ Begin Sequence
                  {"WK_FLAG"  , "L", 1                              , 0                              }}
 
 
-   cArq:= CriaTrab(aEstrutura, .T.)
    cAlias:= "Work2"
-   DBUseArea(.T., __LocalDriver, cArq, cAlias, .T., .F.)
+
+   oTempTable3 := FWTemporaryTable():New(cAlias)
+   oTemptable3:SetFields( aEstrutura )
+   oTempTable3:Create()
 
    //Armazena os arquivos criados para exclusão
-   AAdd(aArq, {cAlias, cArq})
+   // AAdd(aArq, {cAlias, cArq})
 
    //Alimenta a Work
    For nCont:= 2 To Len(aProdutos[nFabr])
@@ -1343,12 +1359,14 @@ Begin Sequence
                  {"WK_DESCNFR", "C", AvSx3("B1_DESC", AV_TAMANHO)   , 0},;
                  {"WK_FLAG"   , "L", 1                              , 0}}
 
-   cArq:= CriaTrab(aEstrutura, .T.)
    cAlias:= "Work3"
-   DBUseArea(.T., __LocalDriver, cArq, cAlias, .T., .F.)
+
+   oTempTable4 := FWTemporaryTable():New(cAlias)
+   oTemptable4:SetFields( aEstrutura )
+   oTempTable4:Create()
 
    //Armazena os arquivos criados para exclusão
-   AAdd(aArq, {cAlias, cArq})
+   // AAdd(aArq, {cAlias, cArq})
 
    //Alimenta a Work
    For nCont:= 2 To Len(aNfRemessa[nFabr])
@@ -1387,12 +1405,14 @@ Begin Sequence
                  {"WK_DTCONH" , "D", AVSx3("D1_EMISSAO", AV_TAMANHO), 0},;
                  {"WK_FLAG"   , "L", 1                              , 0}}
 
-   cArq:= CriaTrab(aEstrutura, .T.)
    cAlias:= "Work5"
-   DBUseArea(.T., __LocalDriver, cArq, cAlias, .T., .F.)
+
+   oTempTable5 := FWTemporaryTable():New(cAlias)
+   oTemptable5:SetFields( aEstrutura )
+   oTempTable5:Create()
 
    //Armazena os arquivos criados para exclusão
-   AAdd(aArq, {cAlias, cArq})
+   // AAdd(aArq, {cAlias, cArq})
 
    //Alimenta a Work
    For nCont:= 2 To Len(aConhTransp[nFabr])

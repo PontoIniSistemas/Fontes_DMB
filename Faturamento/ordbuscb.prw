@@ -15,6 +15,7 @@ User Function ORDBUSCB(cT)
 
 Private aVetCampos := {}
 Private cX := If(cT==Nil,"",cT)
+Private oTempTable := Nil
 
 DbSelectArea("VS3")
 DbSetOrder(1)
@@ -69,6 +70,8 @@ EndIf
                       
 MS_FLUSH()
 
+oTempTable:Delete()
+
 Return(Allwaystrue())
 
 /*
@@ -94,8 +97,9 @@ aadd(aVetCampos,{ "TRB_CODITE" , "C" ,53 , 0 })  && GRUPO+CODITE+DESCR
 aadd(aVetCampos,{ "TRB_LOCALI" , "C" ,15 , 0 })  && LOCALIZACAO
 aadd(aVetCampos,{ "TRB_QTDREQ" , "N" , 8 , 2 })  && REQUISITADA
 
-cArqTra := CriaTrab(aVetCampos, .T.)
-DbUseArea( .T.,, cArqTra, "TRB", Nil, .F. )
+oTempTable := FWTemporaryTable():New("TRB")
+oTemptable:SetFields( aVetCampos )
+oTempTable:Create()
 
 DbSelectArea("TRB")
 cArqInd1 := CriaTrab(NIL, .F.)

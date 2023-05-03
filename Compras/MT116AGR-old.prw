@@ -22,7 +22,7 @@ If IsInCallStack("U_MTUFOPRO")
 	cQryExc +=" AND D_E_L_E_T_ <> '*'"+CHR(13)+CHR(10)
 			
 	If (TCSQLExec(cQryExc) < 0)		    	
-		conout("TCSQLError() " + TCSQLError())	   	
+		FWLogMsg("INFO",,"LOG",,,,"TCSQLError() " + TCSQLError(),,,)	
 	EndIf
 	      									
 EndIf               

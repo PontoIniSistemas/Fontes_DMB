@@ -671,15 +671,15 @@ If !File(_cFileDbf)
 	_aStruc[25] := {"FILIALD"  ,"C",02,0}
 	_aStruc[26] := {"MATD"     ,"C",06,0}
 
-	oTempTable := FWTemporaryTable():New("TRB", _cFileDbf)
+	oTempTable := FWTemporaryTable():New("TRB")
 	oTemptable:SetFields(_aStruc)
 	oTempTable:Create()
-	IndRegua("TRB",FileNoExt(_cFileDbf),_cIndice,,,"Selecionando Registros...")
+	// IndRegua("TRB",FileNoExt(_cFileDbf),_cIndice,,,"Selecionando Registros...")
 Else
-	oTempTable := FWTemporaryTable():New("TRB", _cFileDbf)
+	oTempTable := FWTemporaryTable():New("TRB")
 	oTemptable:SetFields(_aStruc)
 	oTempTable:Create()
-	IndRegua("TRB",FileNoExt(_cFileDbf),_cIndice,,,"Selecionando Registros...")
+	// IndRegua("TRB",FileNoExt(_cFileDbf),_cIndice,,,"Selecionando Registros...")
 EndIf
 
 Return Nil

@@ -162,6 +162,8 @@ Static FUNCTION ExecIV200()
 lRetFunc:=.T.
 dIniEncerra:=dFimEncerra:=NIL
 
+Local lPergunte1 := Pergunte( "EICIV2", !lScheduled )
+
 PRIVATE MTab_PO[30],MTab_IV[30], dIniEncerra, dFimEncerra, cIdentCT, lPrimeiroPo
 PRIVATE MTab_HAWB[1590],MTabVlr_H[1590],MTab_CADT[1590],MTab_BCO[1590]  && LAB 26.10.98
 
@@ -177,7 +179,7 @@ dIniEncerra := AVCTOD('')
 dFimEncerra := AVCTOD("31/12/00")
 
 While .T.
-   IF !(lStatus:=Pergunte( "EICIV2", !lScheduled ))  .OR.  ! U_IV_VALID("*")
+   IF !(lStatus:=lPergunte1)  .OR.  ! U_IV_VALID("*")
       IF !lStatus
           lRetFunc:=.F.
           Exit

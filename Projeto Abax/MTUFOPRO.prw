@@ -68,9 +68,9 @@ User Function MTUFOPRO(cEmpAbx, cFilAbx, cIdAbx)
 		aInfo := GetUserInfoArray()
   		For nI := 1 to Len(aInfo)
     		If aInfo[nI][5] == "U_MTUFOPRO" .And. aInfo[nI][3] <> Threadid()
-        		Conout('---------------------------------------------------------------------------------------------')
-        		Conout('Função MTUFOPRO sendo Utilizada! ')
-        		Conout('---------------------------------------------------------------------------------------------')
+        		SENDLOG('---------------------------------------------------------------------------------------------')
+        		SENDLOG('Função MTUFOPRO sendo Utilizada! ')
+        		SENDLOG('---------------------------------------------------------------------------------------------')
         		Return      
      		EndIf
  		Next nI
@@ -95,9 +95,9 @@ User Function MTUFOPRO(cEmpAbx, cFilAbx, cIdAbx)
 		//<-Leonardo Vasco - Define se os valores dos impostos serão enviados zerados, .T. Envia .F. Não envia; 
 		//--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
 	
-		Conout('---------------------------------------------------------------------------------------------')
-		Conout('INICIO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO')
-		Conout('---------------------------------------------------------------------------------------------')
+		SENDLOG('---------------------------------------------------------------------------------------------')
+		SENDLOG('INICIO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO')
+		SENDLOG('---------------------------------------------------------------------------------------------')
 	
 		//Função busca as Filiais cadastradas no sigamat.emp Leo Viana 26/10/2015
 		dbSelectarea('SM0')
@@ -127,14 +127,14 @@ User Function MTUFOPRO(cEmpAbx, cFilAbx, cIdAbx)
 			If Select('ZNF') > 0
 				U_MImpNFs(aEmpSmar[n][1],aEmpSmar[n][2],cUsuSm,cSenSm)			   
 		  	Else
-		   	Conout('EMPRESA SEM ZNF' + aEmpSmar[n][1] )
+		   	SENDLOG('EMPRESA SEM ZNF' + aEmpSmar[n][1] )
 		  	Endif
 		
 		Next	
 	
-		Conout('---------------------------------------------------------------------------------------------')
-	   Conout('FIM IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO')
-	   Conout('---------------------------------------------------------------------------------------------')	
+		SENDLOG('---------------------------------------------------------------------------------------------')
+	   SENDLOG('FIM IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO')
+	   SENDLOG('---------------------------------------------------------------------------------------------')	
 	   RpcClearEnv()
 	Else	
    	RpcSetEnv( cEmpAbx,cFilAbx," " ," ", "COM", "MATA103", aTables, , , ,  ) 
@@ -154,10 +154,10 @@ User Function MImpNFs(cEmpMa,cFilMa,cUsusm,cSenSm)
 * a empresas que possuem muitas empresas e filiais.
 ******************************************************************************
  
-	Conout('---------------------------------------------------------------------------------------------')
- 	Conout('PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa ) 
- 	Conout ('SIGAMAT.EMP ' + SM0->M0_CODIGO+'-'+SM0->M0_CODFIL)
- 	Conout('---------------------------------------------------------------------------------------------')
+	SENDLOG('---------------------------------------------------------------------------------------------')
+ 	SENDLOG('PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa ) 
+ 	SENDLOG ('SIGAMAT.EMP ' + SM0->M0_CODIGO+'-'+SM0->M0_CODFIL)
+ 	SENDLOG('---------------------------------------------------------------------------------------------')
 	 
  	cAlias:= FSBusDados(cFilMa)
 		
@@ -167,13 +167,13 @@ User Function MImpNFs(cEmpMa,cFilMa,cUsusm,cSenSm)
  	If !Empty((cAlias)->ZNF_DOC+(cAlias)->ZNF_SERIE+(cAlias)->ZNF_FORNEC+  (cAlias)->ZNF_LOJA)
 		/* Função Gera NF de Entrada dentro do sistema Protheus*/
 		FSGeraNFE(cAlias)
-	 	Conout('---------------------------------------------------------------------------------------------')
-	 	Conout('FIM PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
-	 	Conout('---------------------------------------------------------------------------------------------')
+	 	SENDLOG('---------------------------------------------------------------------------------------------')
+	 	SENDLOG('FIM PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
+	 	SENDLOG('---------------------------------------------------------------------------------------------')
  	Else
-	 	Conout('---------------------------------------------------------------------------------------------')
-    	Conout('FIM PROCESSO SEM MOVIMENTO - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
-	 	Conout('---------------------------------------------------------------------------------------------')		 
+	 	SENDLOG('---------------------------------------------------------------------------------------------')
+    	SENDLOG('FIM PROCESSO SEM MOVIMENTO - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
+	 	SENDLOG('---------------------------------------------------------------------------------------------')		 
  	Endif		 				  						 					
  	
  	If Select(cAlias) > 0
@@ -382,7 +382,7 @@ Static Function FSBusDados(cFilImp)
 			cQryDel += " SET ZNF_STATUS = '2' WHERE R_E_C_N_O_  = '"+Alltrim(STR(nRecWMS))+"' "
 	         
 			If (TCSQLExec(cQryDel) < 0)
-			    conout("NÃO AJUSTOU ZNF - ERRO AJUSTES WMS - TCSQLError() " + TCSQLError())
+			    SENDLOG("NÃO AJUSTOU ZNF - ERRO AJUSTES WMS - TCSQLError() " + TCSQLError())
 			EndIf
 				
 			dbSelectArea(cPreWMS)
@@ -487,7 +487,7 @@ Static Function FSGeraNFE(cPrefix)
 	(cPrefix)->(dbGoTop())		
 
 	Do While (cPrefix)->(!Eof())
-	   //Conout('MTUFOPRO - IMPORTANDO NOTA  '+ (cPrefix)->ZNF_DOC+'-'+ (cPrefix)->ZNF_SERIE+'-'+(cPrefix)->ZNF_FORNEC+'-'+(cPrefix)->ZNF_LOJA)
+	   //SENDLOG('MTUFOPRO - IMPORTANDO NOTA  '+ (cPrefix)->ZNF_DOC+'-'+ (cPrefix)->ZNF_SERIE+'-'+(cPrefix)->ZNF_FORNEC+'-'+(cPrefix)->ZNF_LOJA)
 	    /* Atualiza Variavel Publica, assim será definido em qual filial deve ser gerado a Nota Fiscal */
 		cFilAnt	:= (cPrefix)->ZNF_FILIAL
 		
@@ -537,7 +537,7 @@ Static Function FSGeraNFE(cPrefix)
 		If !lImport		                                 
          //Trocado Log para mostrar só uma vez no console.log, da forma antiga a nota era grava para cada item da mesma.
          //Leonardo Vasco Viana 21/07/2017
-			Conout('MTUFOPRO - IMPORTANDO NOTA  '+ (cPrefix)->ZNF_DOC+'-'+ (cPrefix)->ZNF_SERIE+'-'+(cPrefix)->ZNF_FORNEC+'-'+(cPrefix)->ZNF_LOJA)
+			SENDLOG('MTUFOPRO - IMPORTANDO NOTA  '+ (cPrefix)->ZNF_DOC+'-'+ (cPrefix)->ZNF_SERIE+'-'+(cPrefix)->ZNF_FORNEC+'-'+(cPrefix)->ZNF_LOJA)
 			
 			If (cPrefix)->ZNF_ESPEC == 'NFE' //			IIF((cPrefix)->ZNF_ESPECI == 'NFE', 'SPED','CTE') //cEspecie	:= 'SPED' 		//  Linha 270       04/09/2015
 				cEspecie	:= 'SPED' 
@@ -1074,15 +1074,15 @@ Static Function FSGeraNFE(cPrefix)
       Endif		
           
 		If !Empty(Alltrim((cPrefix)->ZNF_CC))
-			Conout('MTUFOPRO - VERIFICAR CENTRO DE CUSTOS DA ZNF')
+			SENDLOG('MTUFOPRO - VERIFICAR CENTRO DE CUSTOS DA ZNF')
 	  		dbSelectArea('CTT')
 			CTT->(dbSetOrder(01))
 			CTT->(dbSeek(xFilial('CTT')+Alltrim((cPrefix)->ZNF_CC)))
 			If !Eof()
-				Conout('MTUFOPRO - ACHOU O CENTRO DE CUSTOS DA ZNF')
+				SENDLOG('MTUFOPRO - ACHOU O CENTRO DE CUSTOS DA ZNF')
 				Aadd(_aLinha,{"D1_CC" 		,Alltrim((cPrefix)->ZNF_CC),Nil})
 			Else
-				Conout('MTUFOPRO -NÃO ACHOU O CENTRO DE CUSTOS DA ZNF')				
+				SENDLOG('MTUFOPRO -NÃO ACHOU O CENTRO DE CUSTOS DA ZNF')				
 			Endif	
    	Else  //Tratamento para enviar Centro de Custo do Pedido de Compras 08/01/2018, caso não exista o CC no Pedido, manda o CC do Produto.
    		If !Empty(Alltrim(SC7->C7_CC))
@@ -1194,7 +1194,7 @@ Static Function FSGeraNFE(cPrefix)
 	cProxSeq := Ver_DOCSEQ() // Retornar o D1_NUMSEQ para a tabela SD1 --cProx := Soma1(PadR(SuperGetMv("MV_DOCSEQ"),nTamSeq),,,.T.)
 	PutMV("MV_DOCSEQ",cProxSeq)
 	
-	Conout('TOTAL DE NOTAS PROCESSADAS ' + str(nZ))
+	SENDLOG('TOTAL DE NOTAS PROCESSADAS ' + str(nZ))
 	dbSelectArea(cPrefix)
 	dbCloseArea()
 	
@@ -1278,7 +1278,7 @@ Static Function FAtuaStat(cCodNota, cCodSer, cCodFor, cLojFor,lOk,cMsg)
 		cQryExc += " AND ZNF_LOJA = '"+	cLojFor+"' "
 		
 		If (TCSQLExec(cQryExc) < 0)
-		    conout("TCSQLError() " + TCSQLError())
+		    SENDLOG("TCSQLError() " + TCSQLError())
 		EndIf*/
   	Else // Tratamento para Oracle
    		//--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
@@ -1314,11 +1314,11 @@ Static Function FAtuaStat(cCodNota, cCodSer, cCodFor, cLojFor,lOk,cMsg)
    		//--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
 		
 		If (TCSQLExec(cQryExc) < 0)
-		    conout("TCSQLError() " + TCSQLError())
+		    SENDLOG("TCSQLError() " + TCSQLError())
 		EndIf
       
 		If (TCSQLExec('commit') < 0)           
-			conout("TCSQLError() " + TCSQLError())
+			SENDLOG("TCSQLError() " + TCSQLError())
 		endif		
 	Endif		
 	RestArea(aAreaZ)
@@ -1492,9 +1492,9 @@ If Empty(cIdAbx)
 	aInfo := GetUserInfoArray()
   	For nI := 1 to Len(aInfo)
    	If aInfo[nI][5] == "U_MTCTEPRO" .And. aInfo[nI][3] <> Threadid()
-        	Conout('---------------------------------------------------------------------------------------------')
-        	Conout('Função MTCTEPRO sendo Utilizada! ')
-        	Conout('---------------------------------------------------------------------------------------------')
+        	SENDLOG('---------------------------------------------------------------------------------------------')
+        	SENDLOG('Função MTCTEPRO sendo Utilizada! ')
+        	SENDLOG('---------------------------------------------------------------------------------------------')
        	Return      
    	EndIf
  	Next nI
@@ -1507,9 +1507,9 @@ If Empty(cIdAbx)
 	cUsuSm := Alltrim(SuperGetMV("MA_USUSMA"))
 	cSenSm := Alltrim(SuperGetMV("MA_PASSMA"))  //Abax@vaccinar1
 	
-	Conout('---------------------------------------------------------------------------------------------')
-	Conout('INICIO IMPORTAÇÃO ÁBAX - FONTE MTCTEPRO')
-	Conout('---------------------------------------------------------------------------------------------')
+	SENDLOG('---------------------------------------------------------------------------------------------')
+	SENDLOG('INICIO IMPORTAÇÃO ÁBAX - FONTE MTCTEPRO')
+	SENDLOG('---------------------------------------------------------------------------------------------')
 
 	dbSelectarea('SM0')
 	SM0->(dbGotop())
@@ -1538,13 +1538,13 @@ If Empty(cIdAbx)
 		If Select('ZNF') > 0
 			U_MImpCTE(aEmpSmar[n][1],aEmpSmar[n][2],cUsuSm,cSenSm)			   
 		Else
-			Conout('EMPRESA SEM ZNF' + aEmpSmar[n][1] )
+			SENDLOG('EMPRESA SEM ZNF' + aEmpSmar[n][1] )
 		Endif
 	Next	
                
-	Conout('---------------------------------------------------------------------------------------------')
-	Conout('FIM IMPORTAÇÃO SMARTNFE - FONTE MTCTEPRO')
-	Conout('---------------------------------------------------------------------------------------------')
+	SENDLOG('---------------------------------------------------------------------------------------------')
+	SENDLOG('FIM IMPORTAÇÃO SMARTNFE - FONTE MTCTEPRO')
+	SENDLOG('---------------------------------------------------------------------------------------------')
 	
 	RpcClearEnv()
 Else	
@@ -1563,10 +1563,10 @@ User Function MImpCTE(cEmpMa,cFilMa,cUsusm,cSenSm)
 * a empresas que possuem muitas empresas e filiais.
 ******************************************************************************
  
-Conout('---------------------------------------------------------------------------------------------')
-Conout('PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTCTEPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa ) 
-Conout ('SIGAMAT.EMP ' + SM0->M0_CODIGO+'-'+SM0->M0_CODFIL)
-Conout('---------------------------------------------------------------------------------------------')
+SENDLOG('---------------------------------------------------------------------------------------------')
+SENDLOG('PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTCTEPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa ) 
+SENDLOG ('SIGAMAT.EMP ' + SM0->M0_CODIGO+'-'+SM0->M0_CODFIL)
+SENDLOG('---------------------------------------------------------------------------------------------')
 
 Private cPedAbax	 
 
@@ -1577,13 +1577,13 @@ dbSelectArea(cAlias)
 
 If !Empty((cAlias)->ZNF_DOC) //+(cAlias)->ZNF_SERIE+(cAlias)->ZNF_FORNEC+  (cAlias)->ZNF_LOJA)
 	u_FSGeraCTE(cAlias)
- 	Conout('---------------------------------------------------------------------------------------------')
- 	Conout('FIM PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
- 	Conout('---------------------------------------------------------------------------------------------')
+ 	SENDLOG('---------------------------------------------------------------------------------------------')
+ 	SENDLOG('FIM PROCESSO IMPORTAÇÃO SMARTNFE - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
+ 	SENDLOG('---------------------------------------------------------------------------------------------')
 Else
- 	Conout('---------------------------------------------------------------------------------------------')
-  	Conout('FIM PROCESSO SEM MOVIMENTO - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
- 	Conout('---------------------------------------------------------------------------------------------')		 
+ 	SENDLOG('---------------------------------------------------------------------------------------------')
+  	SENDLOG('FIM PROCESSO SEM MOVIMENTO - FONTE MTUFOPRO - Empresa ' +cEmpMa + ' Filial '+cFilMa )
+ 	SENDLOG('---------------------------------------------------------------------------------------------')		 
 Endif		 				  						 					
                  
 dbCloseArea(cAlias)
@@ -1805,7 +1805,7 @@ User Function  Busca_NFs(cFilImp, cDocCTe, cSerCTe, cForCTe, cLojCTe)
 		dbSelectArea("SB1")
 		dbSetOrder(1)
 		If !SB1->(MsSeek(xFilial("SB1")+(cBusCTE)->ZNF_COD))  
-		    ConOut("Cadastrar produto: " +(cBusCTE)->ZNF_COD)
+		    SENDLOG("Cadastrar produto: " +(cBusCTE)->ZNF_COD)
 		EndIf                           
 			
 	    dbSelectArea("SF1")
@@ -1907,7 +1907,7 @@ Static Function FAtuaCTE(cCodNota, cCodSer, cCodFor, cLojFor,lOk,cMsg)
 		cQryExc += " AND ZNF_LOJCTE = '"+	cLojFor+"' "
 			
 		If (TCSQLExec(cQryExc) < 0)
-		    conout("TCSQLError() " + TCSQLError())
+		    SENDLOG("TCSQLError() " + TCSQLError())
 		EndIf*/
 	Else // Tratamento para Oracle
 	                                                                                                                     
@@ -1918,11 +1918,11 @@ Static Function FAtuaCTE(cCodNota, cCodSer, cCodFor, cLojFor,lOk,cMsg)
 		cQryExc += " AND ZNF_LOJCTE = '"+cLojFor+"' "
 			
 		If (TCSQLExec(cQryExc) < 0)
-		    conout("TCSQLError() " + TCSQLError())
+		    SENDLOG("TCSQLError() " + TCSQLError())
 		EndIf
 	      
 		If (TCSQLExec('commit') < 0)           
-			conout("TCSQLError() " + TCSQLError())
+			SENDLOG("TCSQLError() " + TCSQLError())
 		endif		
 	Endif		              
 	/* Tratamento para gravar o campo F1_ZUSER ou F1_USUSMAR quando a origem for CTe Vinculados - Mata116, com isso a atualização será feita por UPDATE.
@@ -1938,7 +1938,7 @@ Static Function FAtuaCTE(cCodNota, cCodSer, cCodFor, cLojFor,lOk,cMsg)
 	cQryExc +="AND D_E_L_E_T_ <> '*'"+CHR(13)+CHR(10)
 	
 	If (TCSQLExec(cQryExc) < 0)
-		conout(" Erro Update F1_USER MATA116 ZUSER- TCSQLError() " + TCSQLError())
+		SENDLOG(" Erro Update F1_USER MATA116 ZUSER- TCSQLError() " + TCSQLError())
 	Else
 		cQryExc :="UPDATE "+RetSqlName("SF1")+""+CHR(13)+CHR(10)
 		cQryExc +="SET F1_USUSMAR = '"+cUserAbx+"'"+CHR(13)+CHR(10)
@@ -1948,12 +1948,12 @@ Static Function FAtuaCTE(cCodNota, cCodSer, cCodFor, cLojFor,lOk,cMsg)
 		cQryExc +="AND F1_LOJA = '"+cLojFor+"'"+CHR(13)+CHR(10)
 		cQryExc +="AND D_E_L_E_T_ <> '*'"+CHR(13)+CHR(10)
 		If (TCSQLExec(cQryExc) < 0)
-		 	conout(" Erro Update F1_USUSMAR MATA116 ZUSER- TCSQLError() " + TCSQLError())
+		 	SENDLOG(" Erro Update F1_USUSMAR MATA116 ZUSER- TCSQLError() " + TCSQLError())
 		Endif				
 	EndIf
 		      
 	If (TCSQLExec('commit') < 0)           
-			conout("  Erro Update F1_USER MATA116 - TCSQLError() " + TCSQLError())
+			SENDLOG("  Erro Update F1_USER MATA116 - TCSQLError() " + TCSQLError())
 	Endif
 	RestArea(aAreaZ)
 Return(Nil)
@@ -2019,4 +2019,21 @@ cProx := Soma1(PadR(cProxAba,6),,,.T.)
 RestArea(aAreaZ)    
 
 Return(cProx)
-	
+
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} LOG
+Retorna o log de um documento
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
+
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
+
+Static Function SENDLOG(cMsg)
+FWLogMsg("INFO",,"LOG",,,,cMsg,,,)
+Return

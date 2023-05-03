@@ -20,6 +20,11 @@ User Function EICCCR3(p_R4)
 LOCAL aAreaComp:={ "SA2","SA6","SYW"}, cAliasCad, nI
 LOCAL aCamposInd:={"A2_COD","A6_COD","YW_COD"}, ccpo, aMarcados:={}, lBrowseFil:=.F., cSvFilAnt
 
+Local lPergunte1 := Pergunte("EICCC1", .T.)
+Local lPergunte2 := Pergunte("EICCC3", .T.)
+Local lPergunte3 := Pergunte("EICCC4", .T.)
+Local lPergunte4 := Pergunte("EICCC5", .T.)
+
 // Define variaveis das funções SetPrint() e SetDefault()
 PRIVATE cString := "SW6", cAlias := Alias()
 PRIVATE NomeRel := "EICCC150"
@@ -40,7 +45,6 @@ PRIVATE cTotBrk:=""
 SX3->(DBSETORDER(2))
 PRIVATE lCposAdto:=SX3->(DBSEEK("WB_PO_DI")) .AND. SX3->(DBSEEK("WB_PGTANT")) .AND. SX3->(DBSEEK("WB_NUMPO"))
 SX3->(DBSETORDER(1))
-
 // lCposAdto->Se existir os cpos referente a pagto antecipado, trata Seek
 // com um campo a mais  WA_PO_DI/WB_PO_DI que, nas parcelas de cambio de DI tera como 
 // conteudo a letra "D".
@@ -52,6 +56,9 @@ Private nVLTOTGER:= 0
 Private nVLTOTUSGER:= 0 
 Private Var1,Var2,Var3,Var4,Var5, aFilSel
 Private lR4       := If(p_R4==NIL,.F.,p_R4) .AND. FindFunction("TRepInUse") .And. TRepInUse()
+
+Private oTempTable := Nil
+
 Do While .T.
 
    
@@ -63,7 +70,7 @@ Do While .T.
    
    Do While .T.
       DBSELECTAREA("SWB")
-      If ! Pergunte("EICCC1", .T.)
+      If !lPergunte1
          lSai:=.T.
          Exit
       EndIf                        
@@ -78,20 +85,20 @@ Do While .T.
       ENDIF
 
       DBSELECTAREA("SWB")
-      cAliasCad:=ALIAS()
+      cAliasCad := ALIAS()
       IF Posicione("SX2",1,"SWB","X2_MODO") == "E"
          lBrowseFil:=.T.
       ENDIF                  
       
       IF(Var3<>4,DBSELECTAREA(aAreaComp[Var3]),(lBrowseFil:=.F.,aMarcados:=ACLONE(aFilSel)))
-      cAliasCad:=ALIAS()
+      cAliasCad := ALIAS()
       If (Posicione("SX2",1,cAliasCad,"X2_MODO") == "C" .OR. ! lBrowseFil) .AND. Var3 <> 4   // verifica se SY3 - CC é exclusivo ou compartilhado??  -- RS 11/01/06
 
-         If Var3 == 2     .And. !Pergunte("EICCC3", .T.)// Por Banco - SA6
+         If Var3 == 2     .And. !lPergunte2// Por Banco - SA6
             Loop      
-         ElseIf Var3 == 3 .And. !Pergunte("EICCC4", .T.)// Por Corretora - SYW
+         ElseIf Var3 == 3 .And. !lPergunte3// Por Corretora - SYW
             Loop      
-         ElseIf Var3 == 1 .And. !Pergunte("EICCC5", .T.)// Por Fornecedor - SA2
+         ElseIf Var3 == 1 .And. !lPergunte4// Por Fornecedor - SA2
             Loop      
          EndIf
          Var5 := MV_PAR01
@@ -245,12 +252,13 @@ ElseIf Var3 == 3 // Por Corretora
    cKey    += STR0006 //"Corretora"
 ElseIf Var3 == 4 // Por Produto
    cKey    += STR0007 //"Produto"        
-EndIf     
+EndIf
 
 IF SELECT("TRB") == 0
-   cArqTrb := CriaTrab(aStru, .T.)
-   dbUseArea(.T., , cArqTrb, "TRB", .F.)
-   ZAP
+   oTempTable := FWTemporaryTable():New("TRB")
+   oTempTable:Create()
+   DbSelectArea("TRB")
+   oTempTable:Zap()
    IndRegua("TRB", cArqTrb, "WKFILIAL+"+cKey+"+Dtos(DT_FECH)", , , STR0008) //"Indexando arquivo de trabalho"
 ENDIF  
                                   

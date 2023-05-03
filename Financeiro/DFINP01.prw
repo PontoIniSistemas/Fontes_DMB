@@ -30,7 +30,7 @@ If	Select('SX2') == 0					//Testa se esta sendo rodado do menu
 	RPCSetType( 3 )						//Não consome licensa de uso
 	RpcSetEnv('01','01',,,,GetEnvServer(),{ "SZ7" })	//Ajustado para a empresa 01 e filial 01 
 	sleep( 5000 )						//Aguarda 5 segundos para que as jobs subam.
-	ConOut('Moedas - Atualizacao de Moedas... '+Dtoc(DATE())+' - '+Time())
+	SENDLOG('Moedas - Atualizacao de Moedas... '+Dtoc(DATE())+' - '+Time())
 	lAuto := .T.
 EndIf
 
@@ -42,14 +42,14 @@ EndIf
 
 If	( lAuto )
 	RpcClearEnv()						//Libera o Environment
-	ConOut('Moedas Atualizadas. '+Dtoc(DATE())+' - '+Time() )
+	SENDLOG('Moedas Atualizadas. '+Dtoc(DATE())+' - '+Time() )
 EndIf
 Return
 
 
 Static Function xExecMoeda()
 
-Local nPass, cFile, cTexto, nLinhas, j, cLinha, cdata, cCompra, cVenda, W
+Local nPass, cFile, cTexto, nLinhas, j, cLinha, cdata, cVenda, W, K
 
 For nPass := 5 to 0 step -1					//Refaz os ultimos 6 dias, caso algum dia falhou a conexao
 	dDataRef := dDataBase - nPass
@@ -64,7 +64,7 @@ For nPass := 5 to 0 step -1					//Refaz os ultimos 6 dias, caso algum dia falhou
 	
 	cTexto  := HttpGet('http://www5.bcb.gov.br/Download/'+cFile)
 	If	( lAuto )
-		ConOut('DownLoading from www5.bcb.gov.br/Download/'+cFile+' In '+Dtoc(DATE())+' On '+Time())
+		SENDLOG('DownLoading from www5.bcb.gov.br/Download/'+cFile+' In '+Dtoc(DATE())+' On '+Time())
 	EndIf
 
 	If ! Empty(cTexto)
@@ -238,4 +238,22 @@ nI2	:= nMedY2 - (nS2*nMedX)					//Ponto que a reta toca Eixo X
 nS3	:= (nN*nSXY3 - (nSX*nSY3)) / (nN*nSXX-(nSX*nSX))	//Coeficiente de X Na Equação
 nI3	:= nMedY3 - (nS3*nMedX)					//Ponto que a reta toca Eixo X
 
+Return
+
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} LOG
+Retorna o log de um documento
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
+
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
+
+Static Function SENDLOG(cMsg)
+FWLogMsg("INFO",,"LOG",,,,cMsg,,,)
 Return

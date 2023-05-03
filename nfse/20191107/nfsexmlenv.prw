@@ -84,7 +84,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 	local cOrigemSB1 := "" // Codigo Origem do Produto (B1_ORIGEM)
 	local cMsgSX5	 := ""
 	local cLibVersion := allTrim( FwLibVersion() )
-	Local cCodMun	:= if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
+	Local cCodMun	:= if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
 		
 	Local dDateCom 	:= Date()	
 		
@@ -924,16 +924,16 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 							cDescMunP := SC5->C5_DESCMUN
 							
 						Else
-							If Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "5208707" //Goiania
+							If Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "5208707" //Goiania
 								cMunPrest := Alltrim(aDest[25])
 								cDescMunP := aDest[08] 
 							Else
 								If ((cAliasSD2)->D2_ORIGLAN $ "LO")
-									cMunPrest := if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
+									cMunPrest := if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
 								Elseif ((cAliasSD2)->D2_ORIGLAN $ "VD")
 									cMunPrest := aDest[07]
 									If Empty(cMunPrest)
-										cMunPrest := if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
+										cMunPrest := if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
 									EndIf
 						   		Else
 									cMunPrest := aDest[07]
@@ -962,23 +962,23 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 						
 						cDescMunP := SC5->C5_DESCMUN
 						
-					ElseIf Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "3507605" .And. SF4->F4_ISSST == '3'			// Bragança Paulista
-						cMunPrest := Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ))
-						cDescMunP := Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CIDCOB,oSigamatX:M0_CIDCOB ))
+					ElseIf Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "3507605" .And. SF4->F4_ISSST == '3'			// Bragança Paulista
+						cMunPrest := Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ))
+						cDescMunP := Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CIDCOB,oSigamatX:M0_CIDCOB ))
 					Else
-						If Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "5208707" //Goiania
+						If Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "5208707" //Goiania
 							cMunPrest := Alltrim(aDest[25])
 							cDescMunP := aDest[08] 
 						Else
 							cDescMunP := aDest[08]
 							If ((cAliasSD2)->D2_ORIGLAN $ "LO")
-								cMunPrest := if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
-								cDescMunP := Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CIDENT,oSigamatX:M0_CIDENT ))
+								cMunPrest := if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
+								cDescMunP := Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CIDENT,oSigamatX:M0_CIDENT ))
 							Elseif ((cAliasSD2)->D2_ORIGLAN $ "VD")
 								cMunPrest := aDest[07]
 								If Empty(cMunPrest)
-									cMunPrest := if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
-									cDescMunP := Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CIDENT,oSigamatX:M0_CIDENT ))
+									cMunPrest := if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )
+									cDescMunP := Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CIDENT,oSigamatX:M0_CIDENT ))
 								EndIf
 					   		Else
 								cMunPrest := aDest[07]
@@ -987,7 +987,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 						Endif
 					EndIf
 					
-					If lSC5 .And. SC5->(FieldPos("C5_MUNPRES")) > 0 .And. Empty(SC5->C5_MUNPRES) .And. if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3509502"
+					If lSC5 .And. SC5->(FieldPos("C5_MUNPRES")) > 0 .And. Empty(SC5->C5_MUNPRES) .And. if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3509502"
 					
 						SA1->(DbSetOrder(1))
 						If SA1->(DbSeek(xFilial("SA1")+SC5->C5_CLIENT+SC5->C5_LOJACLI))
@@ -1091,7 +1091,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 								DbSeek(xFilial("SA2")+SD1->D1_FORNECE+SD1->D1_LOJA)
 							EndIf
 							
-							aadd(aNfVinc,{SD1->D1_EMISSAO,SD1->D1_SERIE,SD1->D1_DOC,IIF(SD1->D1_TIPO $ "DB",IIF(SD1->D1_FORMUL=="S",if( type( "oSigamatX" ) == "U",SM0->M0_CGC,oSigamatX:M0_CGC ),SA1->A1_CGC),IIF(SD1->D1_FORMUL=="S",if( type( "oSigamatX" ) == "U",SM0->M0_CGC,oSigamatX:M0_CGC ),SA2->A2_CGC)),if( type( "oSigamatX" ) == "U",SM0->M0_ESTCOB,oSigamatX:M0_ESTCOB ),SF1->F1_ESPECIE})
+							aadd(aNfVinc,{SD1->D1_EMISSAO,SD1->D1_SERIE,SD1->D1_DOC,IIF(SD1->D1_TIPO $ "DB",IIF(SD1->D1_FORMUL=="S",if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CGC,oSigamatX:M0_CGC ),SA1->A1_CGC),IIF(SD1->D1_FORMUL=="S",if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CGC,oSigamatX:M0_CGC ),SA2->A2_CGC)),if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_ESTCOB,oSigamatX:M0_ESTCOB ),SF1->F1_ESPECIE})
 						EndIf
 					Else
 						aOldReg  := SD2->(GetArea())
@@ -1112,7 +1112,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 								DbSeek(xFilial("SA2")+SD2->D2_CLIENTE+SD2->D2_LOJA)
 							EndIf
 							
-							aadd(aNfVinc,{SF2->F2_EMISSAO,SD2->D2_SERIE,SD2->D2_DOC,if( type( "oSigamatX" ) == "U",SM0->M0_CGC,oSigamatX:M0_CGC ),if( type( "oSigamatX" ) == "U",SM0->M0_ESTCOB,oSigamatX:M0_ESTCOB ),SF2->F2_ESPECIE})
+							aadd(aNfVinc,{SF2->F2_EMISSAO,SD2->D2_SERIE,SD2->D2_DOC,if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CGC,oSigamatX:M0_CGC ),if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_ESTCOB,oSigamatX:M0_ESTCOB ),SF2->F2_ESPECIE})
 						EndIf
 						RestArea(aOldReg)
 						RestArea(aOldReg2)
@@ -1148,7 +1148,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 				EndIf
 				// Msg Zona Franca de Manaus / ALC
 				dbSelectArea("SF3")
-				If Alltrim(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "4303905"
+				If Alltrim(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN )) == "4303905"
 					dbSetOrder(5)//F3_FILIAL+F3_SERIE+F3_NFISCAL+F3_CLIEFOR+F3_LOJA+F3_IDENTFT
 					nItem := PadL((cAliasSD2)->D2_ITEM,6,"0")                                                                                                     
 					If DbSeek(xFilial("SF3")+(cAliasSD2)->D2_SERIE+(cAliasSD2)->D2_DOC+(cAliasSD2)->D2_CLIENTE+(cAliasSD2)->D2_LOJA+nItem)			
@@ -1266,10 +1266,10 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 					dbSelectArea("CD2")
 					dbSkip()
 				EndDo
-				If if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "4205407" //florianopolis
-					nValTotPrd := IIF(!(cAliasSD2)->D2_TIPO$"IP",IIF(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308",(cAliasSD2)->D2_PRCVEN * (cAliasSD2)->D2_QUANT,(cAliasSD2)->D2_TOTAL),0)
+				If if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "4205407" //florianopolis
+					nValTotPrd := IIF(!(cAliasSD2)->D2_TIPO$"IP",IIF(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308",(cAliasSD2)->D2_PRCVEN * (cAliasSD2)->D2_QUANT,(cAliasSD2)->D2_TOTAL),0)
 				Else
-					nValTotPrd := IIF(!(cAliasSD2)->D2_TIPO$"IP",IIF(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308",(cAliasSD2)->D2_PRCVEN * (cAliasSD2)->D2_QUANT,(cAliasSD2)->D2_TOTAL),0)+((cAliasSD2)->D2_DESCON+(cAliasSD2)->D2_DESCZFR)
+					nValTotPrd := IIF(!(cAliasSD2)->D2_TIPO$"IP",IIF(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308",(cAliasSD2)->D2_PRCVEN * (cAliasSD2)->D2_QUANT,(cAliasSD2)->D2_TOTAL),0)+((cAliasSD2)->D2_DESCON+(cAliasSD2)->D2_DESCZFR)
 				EndIf	
 				If lAglutina
 					If Len(aProd) > 0			
@@ -1284,7 +1284,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 							aProd[nx][25]+= a410Arred( (cAliasSD2)->D2_BASEISS, "D2_TOTAL" )
 							aProd[nx][26]+= (cAliasSD2)->D2_VALFRE               						
 
-							If if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308"									
+							If if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308"									
 								aProd[nx][27]+=	a410Arred( IIF(!(cAliasSD2)->D2_TIPO $ "IP",(cAliasSD2)->D2_TOTAL,0), "D2_TOTAL" )
 								aProd[nx][10] := aProd[nx][28]+=	a410Arred( IIF(!(cAliasSD2)->D2_TIPO $ "IP",(cAliasSD2)->D2_TOTAL,0) + ((cAliasSD2)->D2_DESCON+(cAliasSD2)->D2_DESCZFR), "D2_TOTAL")	//Valor Total						
 							Else		
@@ -1326,7 +1326,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 								(cAliasSD2)->D2_VALFRE,;
 								(cAliasSD2)->D2_SEGURO,;
 								((cAliasSD2)->D2_DESCON+(cAliasSD2)->D2_DESCZFR),;
-								IIF(!(cAliasSD2)->D2_TIPO$"IP",(cAliasSD2)->D2_PRCVEN+IIf(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "4205407",0,(((cAliasSD2)->D2_DESCON+(cAliasSD2)->D2_DESCZFR)/(cAliasSD2)->D2_QUANT)),0),;								
+								IIF(!(cAliasSD2)->D2_TIPO$"IP",(cAliasSD2)->D2_PRCVEN+IIf(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "4205407",0,(((cAliasSD2)->D2_DESCON+(cAliasSD2)->D2_DESCZFR)/(cAliasSD2)->D2_QUANT)),0),;								
 								IIF(SB1->(FieldPos("B1_CODSIMP"))<>0,SB1->B1_CODSIMP,""),; //codigo ANP do combustivel
 								IIF(SB1->(FieldPos("B1_CODIF"))<>0,SB1->B1_CODIF,""),; //CODIF
 								RetFldProd(SB1->B1_COD,"B1_CNAE"),;
@@ -1337,7 +1337,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 								SF3->F3_CODISS,;
 								(cAliasSD2)->D2_BASEISS,;
 								(cAliasSD2)->D2_VALFRE,;
-								a410Arred( IIF(!(cAliasSD2)->D2_TIPO$"IP",IIF(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308",(cAliasSD2)->D2_PRCVEN * (cAliasSD2)->D2_QUANT,(cAliasSD2)->D2_TOTAL),0), FuCamArren(nCamPrcv,nCamQuan,nCamTot) ),; // Valor Liquido
+								a410Arred( IIF(!(cAliasSD2)->D2_TIPO$"IP",IIF(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308",(cAliasSD2)->D2_PRCVEN * (cAliasSD2)->D2_QUANT,(cAliasSD2)->D2_TOTAL),0), FuCamArren(nCamPrcv,nCamQuan,nCamTot) ),; // Valor Liquido
 								a410Arred( FunValTot((cAliasSD2)->D2_TIPO,(cAliasSD2)->D2_PRCVEN, (cAliasSD2)->D2_QUANT, getValTotal(nValTotPrd,(cAliasSD2)->D2_TOTAL), (cAliasSD2)->D2_DESCON, (cAliasSD2)->D2_DESCZFR, (cAliasSD2)->D2_VALICM), FuCamArren(nCamPrcv,nCamQuan,nCamTot) ),; //Valor Total
 								getValDesc(lMvded, SF2->F2_CLIENTE, SF2->F2_LOJA, SF2->F2_DOC, SF2->F2_SERIE,(cAliasSD2)->D2_CODISS,(cAliasSD2)->D2_DESCON ),; //Valor Total de deducoes.
 								(cAliasSD2)->D2_VALIMP4,; //30
@@ -1551,8 +1551,8 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 				cString	+= prestacao( cMunPrest, cDescMunP, aDest, cMunPSIAFI )
 				cString	+= intermediario( aInterm )
 				cString	+= tomador( aDest )
-				cString	+= servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe, aCST, aDest[22], if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ), cF4Agreg ,nDescon,cFntCtrb,@aLeiTrp,lRecIrrf )
-				cString	+= valores( aISSQN, aRetido, aTotal, aDest, if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ),aLeiTrp,lRecIrrf )
+				cString	+= servicos( aProd, aISSQN, aRetido, cNatOper, lNFeDesc, cDiscrNFSe, aCST, aDest[22], if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ), cF4Agreg ,nDescon,cFntCtrb,@aLeiTrp,lRecIrrf )
+				cString	+= valores( aISSQN, aRetido, aTotal, aDest, if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ),aLeiTrp,lRecIrrf )
 				cString	+= faturas( aDupl )
 				cString	+= pagtos( aDupl,cCondPag )
 				cString	+= deducoes( aProd, aDeduz, aDeducao )
@@ -1570,7 +1570,7 @@ user function nfseXMLEnv( cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotC
 		
 	Else 
 	
-		cString := u_NFseM102( if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ), cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotCancela, {} )[1]
+		cString := u_NFseM102( if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ), cTipo, dDtEmiss, cSerie, cNota, cClieFor, cLoja, cMotCancela, {} )[1]
 	
 	EndIf
 	
@@ -1616,14 +1616,14 @@ static function assina( aDeduz, aNota, aProd, aTotal, aDest, aDeducao, aCst )
 		//-----------------------------------------------------------------------------------
 		//- Provedor DSFNet: Tratamento para considerar o valor das deducoes na assinatura 
 		//-----------------------------------------------------------------------------------
-		if( alltrim( if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) ) $ Fisa022Cod( "001" ) )
+		if( alltrim( if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) ) $ Fisa022Cod( "001" ) )
 			for nX := 1 to len( aDeducao )
 				nDeduz += aDeducao[nX][1]
 			next
 		endIf
 	endIf
 	
-	cAssinatura	+= strZero( val( if( type( "oSigamatX" ) == "U",SM0->M0_INSCM,oSigamatX:M0_INSCM ) ), 11 ) 
+	cAssinatura	+= strZero( val( if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_INSCM,oSigamatX:M0_INSCM ) ), 11 ) 
 	cAssinatura	+= "NF   "
 	cAssinatura	+= strZero( val( aNota[02] ), 12 )       
 	cAssinatura	+= dToS( aNota[03] )
@@ -1698,10 +1698,10 @@ static function ident( aNota, aProd, aTotal, aDest, aISSQN, aAIDF, dDateCom, aCS
 	cString	:= "<identificacao>"
 	
 	cString	+= "<dthremissao>" + subStr( dToS( aNota[3] ), 1, 4 ) + "-" + subStr( dToS( aNota[3] ), 5, 2 ) + "-" + subStr( Dtos( aNota[3] ), 7, 2 ) + 'T' + aNota[9] + "</dthremissao>"
-	If UsaAidfRps(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ))
+	If UsaAidfRps(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ))
 		cString	+= "<serierps>" + allTrim( aAIDF[2] ) + "</serierps>"
 		cString	+= "<numerorps>" + allTrim( aAIDF[3]) + "</numerorps>"
-	ElseIf (if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "3303401") // Tratamento específico para Nova Friburgo - RJ
+	ElseIf (if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "3303401") // Tratamento específico para Nova Friburgo - RJ
 		cString	+= "<serierps>" + allTrim( aNota[1] ) + "</serierps>"
 		cString	+= "<numerorps>" + allTrim( aNota[2] ) + "</numerorps>"
 	Else
@@ -1770,7 +1770,7 @@ static function ident( aNota, aProd, aTotal, aDest, aISSQN, aAIDF, dDateCom, aCS
 	//- Tratamento da DATA DE COMPETENCIA DO RPS
 	//- Especifico para os municipios de: Vitoria-ES e Varginha-MG
 	//-----------------------------------------------------------------------------------------------
-	If (if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "3205309-3170701")
+	If (if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "3205309-3170701")
 		IF dDateCom == Date() .Or. Empty(dDateCom)  
 			cString += "<competenciarps>"+ subStr( dToS( aNota[3] ), 1, 4 ) + "-" + subStr( dToS( aNota[3] ), 5, 2 ) + "-" + subStr( Dtos( aNota[3] ), 7, 2 ) + "</competenciarps>"
 		Else 
@@ -1778,7 +1778,7 @@ static function ident( aNota, aProd, aTotal, aDest, aISSQN, aAIDF, dDateCom, aCS
 		Endif 		
 	Endif
 	
-	If UsaAidfRps(if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ))
+	If UsaAidfRps(if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ))
 		cString += "<codverificacao>" +aAIDF[1]+ "</codverificacao>"		
 	Endif
 
@@ -1898,7 +1898,7 @@ static function prest()
 	local	cMVDTINISI		:= allTrim( getMV( "MV_DTINISI",, " " ) )
 	local	cString			:= ""
 	
-	if( type( "oSigamatX" ) == "U" )
+	if( CALLTYPE( "oSigamatX" ) == "U" )
 		aTemp			:= fisGetEnd( SM0->M0_ENDCOB )
 		
 		cString	+= "<prestador>"
@@ -2282,7 +2282,7 @@ Static Function tomador( aDest )
 		Endif
 		cString	+= "<razao>" + allTrim( aDest[2] ) + "</razao>"
 		
-		If if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ '3550308-3170701'			
+		If if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ '3550308-3170701'			
 			cString	+= "<tipologr>"+ retTipoLogr( aDest[ 3 ] ) +"</tipologr>"	
 		Else
 			cString	+= "<tipologr>2</tipologr>"
@@ -2295,12 +2295,12 @@ Static Function tomador( aDest )
 		cString	+= "<tipobairro>1</tipobairro>"
 		cString	+= "<bairro>" + allTrim( aDest[6] ) + "</bairro>"
 		
-		If if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "5208707" .And. !empty( allTrim( aDest[25] ) )
+		If if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "5208707" .And. !empty( allTrim( aDest[25] ) )
 			cCodTom := aDest[25] // SA1->A1_OUTRMUN
 		Else
 			cCodTom := aDest[07] // SA1->A1_COD_MUN
 		EndIf
-		If Len( cCodTom ) <= 5 .And. (!(cCodTom $ '99999').Or. (cCodTom $ '99999' .And. if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ '3550308|3552205|4205407|3300704|3156700|4115200|4208203|4204202'))
+		If Len( cCodTom ) <= 5 .And. (!(cCodTom $ '99999').Or. (cCodTom $ '99999' .And. if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ '3550308|3552205|4205407|3300704|3156700|4115200|4208203|4204202'))
 			cCodTom := UfIBGEUni(aDest[09]) + cCodTom
 		EndIf
 		
@@ -2335,7 +2335,7 @@ Static Function tomador( aDest )
 		else
 			cString += '<situacaoespecial>0</situacaoespecial>'
 		endif
-		If if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308" .And. Len(aDest) > 21
+		If if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308" .And. Len(aDest) > 21
 			If !Empty(aDest[22]) .And. !Empty(aDest[23])
 				If FindFunction("HS_NFEINTE")
 					aIntermed := HS_NFEINTE(aDest[22],aDest[23])
@@ -3764,7 +3764,7 @@ Local lMvtot	:= SuperGetMV("MV_NFSETOT",,.F.) // Parâmetro para somar o desconto
 
 If !cTipo $ "IP"
 	
-	If if( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308"
+	If if( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) == "3550308"
 		nTotal := nPrcVen * nQtde
 	Else
 		nTotal := nTotDoc
@@ -3989,7 +3989,7 @@ static function getValTotal( nValTotPed, nSD2_TOTAL )
 	//------------------------------------------------------
 	if( (valtype("nValTotPed") <> "U") .and. (valtype("nSD2_TOTAL") <> "U") )
 		if( (valtype(nValTotPed) == "N") .and. (valtype(nSD2_TOTAL) == "N") ) 
-			if( iif( type( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "2927408" )
+			if( iif( CALLTYPE( "oSigamatX" ) == "U",SM0->M0_CODMUN,oSigamatX:M0_CODMUN ) $ "2927408" )
 				lValSemDesc := .T.
 			endif
 		endif	
@@ -4240,3 +4240,20 @@ If FindFunction("ColUsaColab")
 	lUsa := ColUsaColab(cModelo)
 endif
 return (lUsa)
+
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} CALLTYPE
+Chama função CALLTYPE()
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
+
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
+
+Static Function CALLTYPE(cPar)
+Return Type(cPar)

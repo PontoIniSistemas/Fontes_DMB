@@ -109,14 +109,14 @@ aAdd(aVerba,{"VALORIG","N",15,2})
 aAdd(aVerba,{"ALTERA", "C",01,0})
 aAdd(aVerba,{"STATUS", "C",01,0})
 
-oTempTable := FWTemporaryTable():New("VER", cArqVerba)
+oTempTable := FWTemporaryTable():New("VER")
 oTemptable:SetFields( aVerba )
 oTempTable:Create()
 dbSelectArea("VER")
 Append From (_cFile) Delimited With ";"
 dbGoTop()
 cIndVerba := CriaTrab(Nil,.F.)
-IndRegua("VER",cIndVerba,"FILIAL+MAT",,,"Selecionando Registros...")
+// IndRegua("VER",cIndVerba,"FILIAL+MAT",,,"Selecionando Registros...")
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Inicializa a regua de processamento                                 ³

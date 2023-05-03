@@ -10,7 +10,7 @@
 User Function WFW120P()
 Local oProcess
 
-   ConOut("Iniciando Processo")
+   // ConOut("Iniciando Processo")
    //Iniciou o Processo 
    oProcess := TWFProcess():New( "000001", "Pedido de Compras" )
    oProcess:NewTask( "Aprovação", "\WORKFLOW\WFW120P1.HTM" )
@@ -18,7 +18,7 @@ Local oProcess
    oProcess:Track("10001",,"","PROCESSO")	
       
    If U_AN_PC(oProcess)                
-      ConOut("INICIA_PC")
+      // ConOut("INICIA_PC")
       U_INICIA_PC(oProcess)
    endif
 Return
@@ -126,7 +126,7 @@ User Function RETORNO_PC(oProcess)
      MsUnLock()
      DBSkip()
   enddo
-  ConOut("Aprovando o Pedido")
+//   ConOut("Aprovando o Pedido")
   
   dbSelectArea('SC7')
   dbSetOrder(1)
@@ -137,5 +137,5 @@ User Function RETORNO_PC(oProcess)
 Return .T.
 
 User Function TIMEOUT_PC(n,oProcess)
-   ConOut("Executando TimeOut:"+Str(n))
+   // ConOut("Executando TimeOut:"+Str(n))
 Return .T.

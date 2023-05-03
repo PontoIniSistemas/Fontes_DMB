@@ -23,7 +23,7 @@ User Function EICDI450()
 *----------------------------------------------------*
 Local lRet :=.T.,cPrograma := ''
 
-If Type('ParamIXB') == 'C'
+If CALLTYPE('ParamIXB') == 'C'
    cPrograma := ParamIXB
 EndIf  
 
@@ -266,8 +266,8 @@ Nr. Container  Tipo Container    Moeda  Dt.Devolucao Dt.Pagto.  Periodo         
 		nSaldoDias := 0
 		nSaldoAnt  := 0 
       
-		Do While Type('SJD->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
-                 Type('SJD->JD_VAL'+AllTrim(Str(nInd))) <> "U" .And. nDias >= nSaldoDias                              
+		Do While CALLTYPE('SJD->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And.;
+                 CALLTYPE('SJD->JD_VAL'+AllTrim(Str(nInd))) <> "U" .And. nDias >= nSaldoDias                              
 
 			If nInd = 1
 				nSaldoDias += &cVar1   
@@ -317,7 +317,7 @@ Nr. Container  Tipo Container    Moeda  Dt.Devolucao Dt.Pagto.  Periodo         
 			cVar1 := 'SJD->JD_ATE'+AllTrim(Str(nInd))
 			cVar2 := 'SJD->JD_VAL'+AllTrim(Str(nInd))
 	             
-			If Type('SJD->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And. Type('SJD->JD_VAL'+AllTrim(Str(nInd))) <> "U" 
+			If CALLTYPE('SJD->JD_ATE'+AllTrim(Str(nInd))) <> "U" .And. CALLTYPE('SJD->JD_VAL'+AllTrim(Str(nInd))) <> "U" 
 				dDiaDe:= dDiaA  + 1 
 			EndIf   
              
@@ -434,3 +434,8 @@ If MV_PAR02 < MV_PAR01
 Endif   
 
 Return lRet
+
+*----------------------------------------------------*
+Static Function CALLTYPE(cPar)
+*----------------------------------------------------*
+Return Type(cPar)

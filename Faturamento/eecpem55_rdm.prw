@@ -27,6 +27,7 @@ User Function EECPEM55
 *---------------------*
 Local lRet := .t., aOrd := SaveOrd({"EEC","EE9","SA2","SX5","SYR"})
 Local cMemo:="", cWkTexto:="", cSY0Seq:="", nItensEE9:=0, z, nX:=0
+Local aSx5Cont := Nil
 
 Private cTitulo:="",dData:=AvCTod("  /  /  "),cRespon:="",nOriCpy:=3,;
         cQuantity := Space(15),cNetWeight := Space(15),;
@@ -191,8 +192,7 @@ Begin Sequence
       DETAIL_P->AVG_C01_60 := MEMOLINE(cEXPMEMO,60,Z)
    NEXT
 
-   SX5->(DbSetOrder(1))
-   SX5->(DbSeek(xFilial("SX5")+"12"+SA2->A2_EST))
+   aSx5Cont := FWGetSX5("12", xFilial("SX5")+"12"+SA2->A2_EST)
 
    // ** Referencia do importador.
    HEADER_P->AVG_C06_60:= AllTrim(EEC->EEC_REFIMP)
@@ -230,7 +230,7 @@ Begin Sequence
    HEADER_P->AVG_C12_60:= AllTrim(Posicione("SYA",1,xFilial("SYA")+SA2->A2_PAIS,"YA_NOIDIOM"))
    
    // ** Grava a data do relatorio.
-   HEADER_P->AVG_C11_60:=AllTrim(SX5->X5_DESCRI)+", "+AllTrim(IF(lEspanhol,IF(EMPTY(dData),"",aMeses[Month(dData)]),cMonth(dData)))+" "+;
+   HEADER_P->AVG_C11_60:=AllTrim(aSx5Cont[1][4])+", "+AllTrim(IF(lEspanhol,IF(EMPTY(dData),"",aMeses[Month(dData)]),cMonth(dData)))+" "+;
                          Space(1)+AllTrim(Str(Day(dData),2))+", "+Space(1)+AllTrim(Str(Year(dData)))
                          
    HEADER_P->AVG_D01_08:=dData
