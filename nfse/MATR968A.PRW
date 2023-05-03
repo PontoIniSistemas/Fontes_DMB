@@ -49,7 +49,6 @@ cString := "SF2"
 wnrel   := "MATR968"
 cPerg   := "MTR968"
 
-AjustaSX1()
 Pergunte(cPerg,.F.)
 
 AADD(aSays,STR0002) //"Impressão do Recibo Provisório de Serviços - RPS"
@@ -218,6 +217,7 @@ Local cPar1			:= SuperGetMv("MV_TXPIS"  )
 Local cPar2			:= SuperGetMv("MV_TXCOFIN")
 Local cPar3			:= SuperGetMV("MV_ALIQIRF")
 Local cPar4			:= SuperGetMv("MV_TXCSLL" )
+Local aContSX5
                                               
 #IFDEF TOP
 	Local cQuery    := "" 
@@ -368,9 +368,9 @@ If lSorocaba
 		//³Busca a descricao do codigo de servicos³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 		cDescrServ := ""
-		SX5->(dbSetOrder(1))
-		If SX5->(dbSeek(xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS))
-			cDescrServ := SX5->X5_DESCRI
+		aContSX5 := FWGetSX5("60", xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS)
+		If Len(aContSX5) > 0
+			cDescrServ := aContSX5[1][4]
 		Endif
 		If lDescrBar
 			SF2->(dbSetOrder(1))
@@ -399,18 +399,16 @@ If lSorocaba
 			SC6->(dbSetOrder(4))
 			SC5->(dbSetOrder(1))
 			If SC6->(dbSeek(xFilial("SC6")+(cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE))
-				dbSelectArea("SX5")
-				SX5->(dbSetOrder(1))
-				If SC5->(dbSeek(xFilial("SC5")+SC6->C6_NUM)) .And. dbSeek(xFilial("SX5")+"60"+PadR(AllTrim((cAliasSF3)->F3_CODISS),6))
-					cServ := AllTrim(SC5->C5_MENNOTA)+CHR(13)+CHR(10)+" | "+AllTrim(SubStr(SX5->X5_DESCRI,1,55)) //#DRF.02.03.2015
+				aContSX5 := FWGetSX5("60", xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS)
+				If SC5->(dbSeek(xFilial("SC5")+SC6->C6_NUM)) .And. Len(aContSX5) > 0
+					cServ := AllTrim(SC5->C5_MENNOTA)+CHR(13)+CHR(10)+" | "+AllTrim(SubStr(aContSX5[1][4],1,55)) //#DRF.02.03.2015
 					//cServ := AllTrim(SC5->C5_MENNOTA)+CHR(13)+CHR(10)
 				Endif
 			Endif
 		Else
-			dbSelectArea("SX5")
-			SX5->(dbSetOrder(1))
-			If dbSeek(xFilial("SX5")+"60"+PadR(AllTrim((cAliasSF3)->F3_CODISS),6))
-				cServ := AllTrim(SubStr(SX5->X5_DESCRI,1,55))
+			aContSX5 := FWGetSX5("60", xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS)
+			If Len(aContSX5) > 0
+				cServ := AllTrim(SubStr(aContSX5[1][4],1,55))
 			Endif
 		Endif
 
@@ -807,9 +805,9 @@ Else
 		//³Busca a descricao do codigo de servicos³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 		cDescrServ := ""
-		SX5->(dbSetOrder(1))
-		If SX5->(dbSeek(xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS))
-			cDescrServ := SX5->X5_DESCRI
+		aContSX5 := FWGetSX5("60", xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS)
+		If Len(aContSX5) > 0
+			cDescrServ := aContSX5[1][4]
 		Endif
 		If lDescrBar
 			SF2->(dbSetOrder(1))
@@ -846,10 +844,9 @@ Else
 				Endif
 			Endif
 		Else
-			dbSelectArea("SX5")
-			SX5->(dbSetOrder(1))
-			If dbSeek(xFilial("SX5")+"60"+PadR(AllTrim((cAliasSF3)->F3_CODISS),6))
-				cServ := AllTrim(SubStr(SX5->X5_DESCRI,1,55))
+			aContSX5 := FWGetSX5("60", xFilial("SX5")+"60"+(cAliasSF3)->F3_CODISS)
+			If Len(aContSX5) > 0
+				cServ := AllTrim(SubStr(aContSX5[1][4],1,55))
 			Endif
 		Endif
 		
@@ -1545,41 +1542,6 @@ For nY := 1 to Len(aAux)
 Next   
 
 Return(aPrint)
-
-/*/
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun‡…o    ³AjustaSX1 ³ Autor ³ Mary C. Hergert       ³ Data ³05/07/2006³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³Cria as perguntas necessarias a impressao do RPS            ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³MATR968                                                     ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-/*/
-Static Function AjustaSX1()
-Local 	aAreaSX1	:= SX1->(GetArea())
-
-SX1->(dbSetOrder(1))
-If SX1->(dbSeek("MTR968    05")) 
-	If SX1->X1_TAMANHO <> TamSx3("F3_NFISCAL")[1]
-    	RecLock("SX1",.F.)
-		SX1->X1_TAMANHO := TamSx3("F3_NFISCAL")[1]
-    	SX1->(MSUnlock())
-	Endif
-Endif
-
-If SX1->(dbSeek("MTR968    06")) 
-	If SX1->X1_TAMANHO <> TamSx3("F3_NFISCAL")[1]
-    	RecLock("SX1",.F.)
-	    SX1->X1_TAMANHO := TamSx3("F3_NFISCAL")[1]
-    	SX1->(MSUnlock())
-	Endif
-Endif
-
-RestArea(aAreaSX1)                   
-Return(.T.)
 
 /*/
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±

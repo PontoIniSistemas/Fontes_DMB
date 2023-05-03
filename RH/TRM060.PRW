@@ -36,13 +36,10 @@ User Function TRM060()
 Local oReport                   
 Local aArea 	:= GetArea()
 Private cPerg   := "TRR60A"
-Private cTitulo	:=	OemToAnsi(STR0010)  //-- Treinamentos Solicitados ou Baixados     Periodo:
+Private cTitulo	:=	OemToAnsi(STR0010) 
+Private oTempTable1 //-- Treinamentos Solicitados ou Baixados     Periodo:
 
 If FindFunction("TRepInUse") .And. TRepInUse()	//Verifica se relatorio personalizal esta disponivel
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Ajusta SX1 para trabalhar com range.                         ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	AcertSX1() 
 	
 	Pergunte(cPerg,.F.)			//-- Usara o mesmo grupo de perguntas 
 	oReport := ReportDef()
@@ -52,6 +49,8 @@ Else
 EndIf  
 
 RestArea( aArea )
+
+oTempTable1:Delete()
 
 Return
 
@@ -211,9 +210,9 @@ AADD(aFields,{"TR_SITUAC",  "C", 13,                      0                     
 AADD(aFields,{"TR_SINON",   "C", TamSx3("RA2_SINON")[1],  TamSx3("RA2_SINON")[2]  } )
 AADD(aFields,{"TR_DESCSI",  "C", TamSx3("RA9_DESCR")[1],  TamSx3("RA9_DESCR")[2]  } )
 
-
-dbCreate(cArqDbf,aFields)
-dbUseArea(.T., NIL, cArqDbf, "TRA", .F.)
+oTempTable1 := FWTemporaryTable():New("TRA")
+oTemptable1:SetFields( aFields )
+oTempTable1:Create()
 
 If nOrdem == 1 		// Matricula 
 	cIndCond := "TR_FILIAL + TR_CURSO + TR_CALEND + TR_TURMA + TR_MAT"
@@ -604,6 +603,8 @@ SetPrvt("CAUXCURSO,CAUXTURMA,LRET")
 SetPrvt("LOK,CCENTRO,CCURSO,CCALEND,CTURMA,CDESCCUR,CDescCal,CAUXDET,DET,LIMP")
 SetPrvt("cAcessaRA3,cAcessaRA4,CSINON,CDESCSI,cCargo")
 
+Local oTempTable2 := Nil
+
 /*
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -655,11 +656,6 @@ nTamanho := "M"
 cTit     := STR0009 //"Treinamentos Solicitados ou Baixados"
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Correcao nas perguntas - Retirar nas novas versoes           ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-AcertSX1()
-
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica as perguntas selecionadas                           ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 pergunte("TRR60A",.F.)
@@ -707,6 +703,9 @@ If nLastKey == 27
 Endif
 
 RptStatus({|lEnd| Relato()},cTit)
+
+oTempTable2:Delete()
+
 Return
 
 
@@ -743,8 +742,9 @@ AADD(aFields,{"TR_SITUAC",  "C", 13,                      0                     
 AADD(aFields,{"TR_SINON",   "C", TamSx3("RA2_SINON")[1],  TamSx3("RA2_SINON")[2]  } )
 AADD(aFields,{"TR_DESCSI",  "C", TamSx3("RA9_DESCR")[1],  TamSx3("RA9_DESCR")[2]  } )
 
-dbCreate(cArqDbf, aFields)
-dbUseArea(.T., NIL, cArqDbf, "TRA", .F.)
+oTempTable2 := FWTemporaryTable():New("TRA")
+oTemptable2:SetFields( aFields )
+oTempTable2:Create()
 
 If nOrdem == 1 		// Matricula 
 	cIndCond := "TR_FILIAL + TR_CURSO + TR_CALEND + TR_TURMA + TR_MAT"
@@ -1151,68 +1151,3 @@ DET := STR0019 + TRA->TR_CC + " - " + DescCC(TRA->TR_CC)		// "CENTRO DE CUSTO: "
 IMPR(DET,"C")   
 
 Return (Nil)
-
-/*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun‡…o    ³AcertSX1	 ³ Autor ³ Desenvolvimento RH   ³ Data ³ 22/07/05 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³Inclusao de consulta (F3) nas perguntas Grupo/Depto/Cargo.  ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³TRM060	                                                  ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function AcertSX1()
-
-Local aSaveArea := GetArea()
-Local aPerg		:= {}
-Local aRegs		:= {} 
-Local nx		:= 0
-Local aHelp		:= {}
-Local aHelpE	:= {}
-Local aHelpI	:= {}
-Local cHelp		:= ""
-
-aHelp:= {"Informe se deseja que sejam ",;
-         "consideradas as ferias programadas ",;
-         "na emissao do relatorio."}
-aHelpE	:= {"Informe si desea que se consideren",;
-            "las vacaciones programadas cuando ",;
-            "se emita el informe.   "    }
-aHelpI	:= {"Inform whether you want to consider ",;
-            "the programmed vacation during printing ",;
-            "the report. "}
-
-PutSX1Help("P"+cHelp,aHelp,aHelpI,aHelpE)
-
-/*
-ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-³           Grupo   Ordem   Pergunta Portugues   Pergunta Espanhol                 Pergunta Ingles          Variavel Tipo Tamanho Decimal Presel  GSC   Valid   Var01      Def01             DefSPA1        DefEng1    Cnt01       Var02  Def02     DefSpa2   DefEng2  Cnt02 Var03 Def03   DefSpa3   DefEng3    Cnt03 Var04 Def04  DefSpa4 DefEng4 Cnt04  Var05  Def05 DefSpa5 DefEng5 Cnt05  XF3   GrgSxg  cPyme aHelpPor aHelpEng aHelpSpa      cHelp                                                                                                                                          ³
-ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ*/
-Aadd(aRegs,{cPerg ,"21","Ferias Programadas  ?"  ,"¿Vacaciones Programadas  ?"   ,"Scheduled Vacation ?"  ,"MV_CHL","N" ,01      ,0     ,1     ,"C"  ,""     ,"MV_PAR22","Sim  "         ,"Si"            ,"Yes"    ,""          ,""   ,"Nao"   ,"No"     ,"No"     ,""  ,""   ,""    ,""       ,""         ,""   ,""   ,""   ,""     ,""     ,""   ,""    ,""    ,""     ,""     ,""   ,""    ,""    ,"S"  ,aHelp   ,aHelpI  ,aHelpE       ,      })
-
-ValidPerg(aRegs,cPerg,.T.)
-
-Aadd( aPerg, {"11", "SQ0"} )	//Grupo
-Aadd( aPerg, {"12", "SQ0"} )	
-Aadd( aPerg, {"13", "SQB"} )	//Depto
-Aadd( aPerg, {"14", "SQB"} )		
-Aadd( aPerg, {"15", "SQ3"} ) 	//Cargo
-Aadd( aPerg, {"16", "SQ3"} )		
-
-For nx := 1 To Len(aPerg)
-
-	dbSelectArea("SX1")   
-	dbSetOrder(1)
-	If dbSeek("TRR60A"+aPerg[nx][1]) .And. Empty(SX1->X1_F3)	
-		RecLock("SX1",.F.)
-	    	SX1->X1_F3	:= aPerg[nx][2]
-		MsUnlock()
-	EndIf	
-Next nx
-
-
-RestArea(aSaveArea)
-
-Return Nil

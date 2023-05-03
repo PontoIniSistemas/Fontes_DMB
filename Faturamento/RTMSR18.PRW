@@ -35,7 +35,6 @@ Private nLastKey := 0
 Private Tamanho  := "M"
 Private Limite   := 132 // 80/132/220
 
-AjustaSX1(cPerg)
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica as perguntas                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -560,78 +559,4 @@ MS_FLUSH()
 RestArea(aAreaSM0)
 RestArea(aAreaAtu)
 
-Return
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Funcao    ³AjustaSX1  ³ Autor ³Richard Anderson    ³ Data ³ 22/11/2006 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descricao ³Inclui Perguntas no SX1                                     ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³RTMSR18                                                     ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function AjustaSX1(cPerg)
-
-Local aHlpPor1 := {"Informe a Filial de Origem Inicial"}
-Local aHlpEsp1 := {"Informe el Sucursal Origen Inicial"}
-Local aHlpIng1 := {"Enter the First Branch Origin"}
-
-Local aHlpPor2 := {"Informe a Viagem Inicial"}
-Local aHlpEsp2 := {"Informe la Viagen Inicial"}
-Local aHlpIng2 := {"Enter the First Number Trip"}               
-
-Local aHlpPor3 := {"Informe a Filial de Origem Final"}
-Local aHlpEsp3 := {"Informe el Sucursal Origen Final"}
-Local aHlpIng3 := {"Enter the Last Branch Origin "}
-
-Local aHlpPor4 := {"Informe a Viagem Final"}
-Local aHlpEsp4 := {"Informe la Viagen Final"}
-Local aHlpIng4 := {"Enter the Last Number Trip"}               
-
-Local aHlpPor5 := {"Informe o Veiculo Inicial"}
-Local aHlpEsp5 := {"Informe el Vehiculo Inicial"}
-Local aHlpIng5 := {"Enter the First Vehicle"}                      
-
-Local aHlpPor6 := {"Informe o Veiculo Final"}
-Local aHlpEsp6 := {"Informe el Vehiculo Final"}
-Local aHlpIng6 := {"Enter the Last Vehicle"}                      
-
-Local aHlpPor7 := {"Informe o Item MIC/DTA Inicial"}
-Local aHlpEsp7 := {"Informe el Item MIC/DTA Inicial"}
-Local aHlpIng7 := {"Enter the First Item MIC/DTA"}               
-
-Local aHlpPor8 := {"Informe o Item MIC/DTA Final"}
-Local aHlpEsp8 := {"Informe el Item MIC/DTA Final"}
-Local aHlpIng8 := {"Enter the Last Item MIC/DTA"}               
-
-Local aHlpPor9 := {"Informe se e Impressao ou Reimpressao."}
-Local aHlpEsp9 := {"Informe la Impression/Reimpresion "}
-Local aHlpIng9 := {"Enter the Printing or Reprinting"}    
-
-SX1->(DbSetOrder(1))
-If Sx1->(dbSeek(cPerg)) 
-	If Alltrim(SX1->X1_PERGUNT)==Alltrim(SX1->X1_PERSPA)
-		While SX1->(!Eof()) .And. Alltrim(SX1->X1_GRUPO)==Alltrim(cPerg)
-			Reclock("SX1",.F.)
-			DBDelete()
-			SX1->(MsUnlock())
-			SX1->(dbSkip())
-		EndDo
-	EndIf
-EndIf
-
-PutSx1( cPerg,"01","Fil.Origem De  ?     ","De Suc.Origen ?    ","From Branch Orig.?     ","mv_ch1","C",2,0,0,"G","","DL5","","","mv_par01","","","","","","","","","","","","","","","","",aHlpPor1,aHlpIng1,aHlpEsp1)
-PutSx1( cPerg,"02","Viagem De  ?         ","De Viaje ?         ","From Number Trip?         ","mv_ch2","C",6,0,0,"G","",""   ,"","","mv_par02","","","","","","","","","","","","","","","","",aHlpPor2,aHlpIng2,aHlpEsp2)
-PutSx1( cPerg,"03","Fil.Origem Até  ?    ","A Suc.Origen ?     ","To Branch Orig.?    ","mv_ch3","C",2,0,0,"G","","DL5","","","mv_par03","","","","","","","","","","","","","","","","",aHlpPor3,aHlpIng3,aHlpEsp3)
-PutSx1( cPerg,"04","Viagem Até  ?        ","A Viaje ?          ","To Number Trip ?        ","mv_ch4","C",6,0,0,"G","",""   ,"","","mv_par04","","","","","","","","","","","","","","","","",aHlpPor4,aHlpIng4,aHlpEsp4)
-PutSx1( cPerg,"05","Veículo De  ?        ","De Vehículo ?      ","From Vehicle ?        ","mv_ch5","C",8,0,0,"G","","DA3","","","mv_par05","","","","","","","","","","","","","","","","",aHlpPor5,aHlpIng5,aHlpEsp5)
-PutSx1( cPerg,"06","Veículo Até  ?       ","A Vehículo ?       ","To Vehicle ?       ","mv_ch6","C",8,0,0,"G","","DA3","","","mv_par06","","","","","","","","","","","","","","","","",aHlpPor6,aHlpIng6,aHlpEsp6)
-PutSx1( cPerg,"07","Item MIC/DTA De  ?   ","De Item MIC/DTA ?  ","From Item MIC/DTA ?   ","mv_ch7","C",3,0,0,"G","",""   ,"","","mv_par07","","","","","","","","","","","","","","","","",aHlpPor7,aHlpIng7,aHlpEsp7)
-PutSx1( cPerg,"08","Item MIC/DTA Até  ?  ","A Item MIC/DTA  ?  ","To Item MIC/DTA ?  ","mv_ch8","C",3,0,0,"G","",""   ,"","","mv_par08","","","","","","","","","","","","","","","","",aHlpPor8,aHlpIng8,aHlpEsp8)
-PutSx1( cPerg,"09","Impressão/Reimpre. ? ","Impresion/Nuev.Imp?","Printing/Reprint.? ","mv_ch9","N",1,0,0,"C","",""   ,"","","mv_par09","Impressão","Impresion","Printing","","Reimpressão","Reimpresion","Repriting","","","","","","","","","",aHlpPor9,aHlpIng9,aHlpEsp9)
-                                                                                                                                                                                                                      
 Return

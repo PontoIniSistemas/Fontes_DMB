@@ -36,7 +36,6 @@ Private aParamRl := Array(20)
 Private Tamanho  := "M"
 Private Limite   := 132 // 80/132/220
 
-AjustaSX1()
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica as perguntas                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -125,6 +124,9 @@ Local  aVias        := { 'Primer original para el remitente. Unico valido para r
                          'Tercer original - Transportista.                                            ' ;
                        }
 Local  nQtdVia      := Len(aVias)
+
+Local cUsrName := AllTrim(UsrRetName(RetCodUsr()))
+Local cRetUser := RetCodUsr()
 
 SetRegua(DTP->(LastRec()))
 
@@ -286,7 +288,7 @@ While (cAliasDT6)->(!Eof())
 				
 				//-- Campo 14: Valor
 				aDadosMer[11,2] := Space(09)+Transform(DT6->DT6_VALMER,"@E 99999,999.99")
-				aDadosMer[12,2] := Space(13)+GetMv('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1)
+				aDadosMer[12,2] := Space(13)+CALLGETMV('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1)
 				
 				nLin += 4
 				For nI := 1 To Len(aDadosMer)
@@ -303,7 +305,7 @@ While (cAliasDT6)->(!Eof())
 				EndIf
 				DIK->(dbSetOrder(4))
 				DIK->(dbSeek(xFilial('DIK')+DT6->(DT6_FILDOC+DT6_DOC+DT6_SERIE)))
-				cDados += Space(30)+GetMv('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1)+Space(6)+Transform(DIK->DIK_VALMER,"@E 99999,999.99")
+				cDados += Space(30)+CALLGETMV('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1)+Space(6)+Transform(DIK->DIK_VALMER,"@E 99999,999.99")
 				@ nLin,070 PSay cDados
 				
 				//-- Campo 15: Composicao do Frete
@@ -396,7 +398,7 @@ While (cAliasDT6)->(!Eof())
 				aDadosFrt[7,4] := aDocAne[4]
 				
 				//-- Simbolo da moeda do documento
-				cSimbMd:= GetMv('MV_SIMB'+Str(DT6->DT6_MOEDA,1),,1)
+				cSimbMd:= CALLGETMV('MV_SIMB'+Str(DT6->DT6_MOEDA,1),,1)
 				
 				nLin += 3
 				For nI := 1 To Len(aDadosFrt)
@@ -447,7 +449,7 @@ While (cAliasDT6)->(!Eof())
 				@ nLin,010 PSay Dtoc(DT6->DT6_DATEMI)
 				
 				//-- Campo 24: Nome do Representante
-				@ nLin,065 PSay AllTrim(UsrRetName(DT6->DT6_USRGER))+' '+AllTrim(UsrRetName(RetCodUsr()))+' crt: '+DT6->(DT6_FILORI+' '+DT6_FILDES+' '+DT6_DOC)
+				@ nLin,065 PSay AllTrim(UsrRetName(DT6->DT6_USRGER))+' '+cUsrName+' crt: '+DT6->(DT6_FILORI+' '+DT6_FILDES+' '+DT6_DOC)
 				
 				//-- Via
 				nLin += 1
@@ -457,7 +459,7 @@ While (cAliasDT6)->(!Eof())
 			//-- Atualiza campo DT6_FIMP (Flag de Impressao)
 			RecLock("DT6",.F.)
 			DT6->DT6_FIMP   := StrZero(1,Len(DT6->DT6_FIMP))
-			DT6->DT6_USRIMP := RetCodUsr()
+			DT6->DT6_USRIMP := cRetUser
 			MsUnlock()
 			DT6->(dbSkip())
 		EndDo
@@ -481,66 +483,19 @@ MS_FLUSH()
 
 Return
 
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Funcao    ³AjustaSX1  ³ Autor ³Richard Anderson    ³ Data ³ 22/11/2006 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descricao ³Inclui Perguntas no SX1                                     ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³RTMSR17                                                     ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function AjustaSX1()
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} CALLGETMV
+Chama função CALLTYPE()
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
 
-Local aHlpPor1 := {"Informe o numero do Lote Inicial"}
-Local aHlpEsp1 := {"Informe el Numero del Lote Inicial"}
-Local aHlpIng1 := {"Enter the First Lot Number"}
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
 
-Local aHlpPor2 := {"Informe o Numero do Lote Final"}
-Local aHlpEsp2 := {"Informe el Numero del Lote Final"}
-Local aHlpIng2 := {"Enter the Last Lot Number"}
-
-Local aHlpPor3 := {"Informe o numero do Documento Inicial"}
-Local aHlpEsp3 := {"Informe el Numero del Documento Inicial"}
-Local aHlpIng3 := {"Enter the First Document Number"}
-
-Local aHlpPor4 := {"Informe o numero do Documento Final"}
-Local aHlpEsp4 := {"Informe el Numero del Documento Final"}
-Local aHlpIng4 := {"Enter the Last Document Number"}                                
-
-Local aHlpPor5 := {"Informe o numero de Serie Inicial"}
-Local aHlpEsp5 := {"Informe la Serie del Documento Inicial"}
-Local aHlpIng5 := {"Enter the First Series Number"}
-
-Local aHlpPor6 := {"Informe o numero de Serie Final"}
-Local aHlpEsp6 := {"Informe la Serie del Documento Final"}
-Local aHlpIng6 := {"Enter the Last Series Number"}                            
-
-Local aHlpPor7 := {"Informe se e Impressao ou Reimpressao."}
-Local aHlpEsp7 := {"Informe la Impression/Reimpresion "}
-Local aHlpIng7 := {"Enter the Printing or Reprinting"}    
-
-SX1->(DbSetOrder(1))
-If Sx1->(dbSeek(cPerg)) 
-	If Alltrim(SX1->X1_PERGUNT)==Alltrim(SX1->X1_PERSPA)
-		While SX1->(!Eof()) .And. Alltrim(SX1->X1_GRUPO)==Alltrim(cPerg)
-			Reclock("SX1",.F.)
-			DBDelete()
-			SX1->(MsUnlock())
-			SX1->(dbSkip())
-		EndDo
-	EndIf
-EndIf
-
-PutSx1( cPerg, "01","Lote De  ?           ","De Lote ?           ","From Lot ?           ","mv_ch1","C",6,0,0,"G","","DTP","","","mv_par01","","","","","","","","","","","","","","","","",aHlpPor1,aHlpIng1,aHlpEsp1)
-PutSx1( cPerg, "02","Lote Ate  ?          ","A Lote ?            ","To Lot ?          ","mv_ch2","C",6,0,0,"G","","DTP","","","mv_par02","","","","","","","","","","","","","","","","",aHlpPor2,aHlpIng2,aHlpEsp2)
-PutSx1( cPerg, "03","Documento De  ?      ","De Documento ?      ","From Document ?	   ","mv_ch3","C",9,0,0,"G","","DT6","","","mv_par03","","","","","","","","","","","","","","","","",aHlpPor3,aHlpIng3,aHlpEsp3)
-PutSx1( cPerg, "04","Documento Ate  ?     ","A Documento  ?      ","To Document ?     ","mv_ch4","C",9,0,0,"G","","DT6","","","mv_par04","","","","","","","","","","","","","","","","",aHlpPor4,aHlpIng4,aHlpEsp4)
-PutSx1( cPerg, "05","Serie De  ?          ","De Serie ?          ","From Series ?          ","mv_ch5","C",3,0,0,"G","",""   ,"","","mv_par05","","","","","","","","","","","","","","","","",aHlpPor5,aHlpIng5,aHlpEsp5)
-PutSx1( cPerg, "06","Serie Ate  ?         ","A Serie  ?          ","To Series ?         ","mv_ch6","C",3,0,0,"G","",""   ,"","","mv_par06","","","","","","","","","","","","","","","","",aHlpPor6,aHlpIng6,aHlpEsp6)
-PutSx1( cPerg, "08","Impressão/Reimpre. ? ","Impresion/Reimpresion?","Printing/Reprint ? ","mv_ch7","N",1,0,0,"C","",""   ,"","","mv_par07","Impressão","Impresion","Printing","","Reimpressão","Reimpresion","Reprinting","","","","","","","","","",aHlpPor7,aHlpIng7,aHlpEsp7)
-
-Return
+Static Function CALLGETMV(cPar1, cPar2, cPar3)
+Return GetMv(cPar1, cPar2, cPar3)

@@ -34,8 +34,6 @@ Local aOrd    := {}
 Private aReturn  := {STR0003,1,STR0004,2, 2, 1, "",1 } //"Zebrado"###"Administracao"
 Private nLastKey := 0
 
-AjustaSX1(cPerg)
-
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica as perguntas                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -388,54 +386,3 @@ If lImpCab
 EndIf
 
 Return NIL
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Funcao    ³AjustaSX1  ³ Autor ³Richard Anderson    ³ Data ³ 22/11/2006 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descricao ³Inclui Perguntas no SX1                                     ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³RTMSR19                                                     ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function AjustaSX1(cPerg)
-
-SX1->(dbSetOrder(1))
-If SX1->(dbSeek(Padr(cPerg,Len(SX1->X1_GRUPO))+"07")) .And. !('Sequencia' $ SX1->X1_PERGUNT)
-	RecLock('SX1',.F.)
-	dbDelete()
-	MsUnLock()
-EndIf
-
-If SX1->(dbSeek(Padr(cPerg,Len(SX1->X1_GRUPO))+"08")) .And. !('Sequencia' $ SX1->X1_PERGUNT)
-	RecLock('SX1',.F.)
-	dbDelete()
-	MsUnLock()
-EndIf
-
-SX1->(DbSetOrder(1))
-If Sx1->(dbSeek(cPerg)) 
-	If Alltrim(SX1->X1_PERGUNT)==Alltrim(SX1->X1_PERSPA)
-		While SX1->(!Eof()) .And. Alltrim(SX1->X1_GRUPO)==Alltrim(cPerg)
-			Reclock("SX1",.F.)
-			DBDelete()
-			SX1->(MsUnlock())
-			SX1->(dbSkip())
-		EndDo
-	EndIf
-EndIf
-
-PutSx1( cPerg,"01","Fil.Documento De ?  ","¿De Suc.Documento ? ","Fil.Documento De ?  ","mv_ch1","C",2,0,0,"G","","DIC","","","mv_par01")
-PutSx1( cPerg,"02","Documento De ?      ","¿De Documento ?     ","Documento De ?      ","mv_ch2","C",6,0,0,"G","",""   ,"","","mv_par02")
-PutSx1( cPerg,"03","Serie De ?          ","¿De Serie ?         ","Serie De ?          ","mv_ch3","C",3,0,0,"G","",""   ,"","","mv_par03")
-PutSx1( cPerg,"04","Fil.Documento Até ? ","¿A Suc.Documento ?  ","Fil.Documento Até ? ","mv_ch4","C",2,0,0,"G","","DIC","","","mv_par04")
-PutSx1( cPerg,"05","Documento Até ?     ","¿A Documento ?      ","Documento Até ?     ","mv_ch5","C",6,0,0,"G","",""   ,"","","mv_par05")
-PutSx1( cPerg,"06","Serie Até ?         ","¿A Serie ?          ","Serie Até ?         ","mv_ch6","C",3,0,0,"G","",""   ,"","","mv_par06")
-PutSx1( cPerg,"07","Sequencia De ?      ","¿De Secuencia ?     ","Sequencia De ?      ","mv_ch7","C",2,0,0,"G","",""   ,"","","mv_par07")
-PutSx1( cPerg,"08","Sequencia Ate ?     ","¿A Secuencia  ?     ","Sequencia Ate ?     ","mv_ch8","C",2,0,0,"G","",""   ,"","","mv_par08")
-PutSx1( cPerg,"09","Impressão/Reimpre.? ","¿Impresion/Nuev.Imp.?","Impressão/Reimpre.? ","mv_ch9","N",1,0,0,"C","",""   ,"","","mv_par09","Impressão","Impresion","Impressão","","Reimpressão","Nueva Impresion","Reimpressão")
-
-Return

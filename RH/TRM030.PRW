@@ -841,6 +841,8 @@ SetPrvt("NTIPO,CCENTRO,CCURSO,CCALEND,CTURMA,CDESCCUR,CDescCal,CAUXDET,DET,LIMP"
 SetPrvt("CENTIDA,CDESCEN,CHORARI,CDURACA,CUNDURA,CINSTRU,CNOMEIN,CLOCAL")
 SetPrvt("cAcessaRA4,CSINON,CDESCSI,CCARGO,aLogCargo,aLogTitle,cMainTitle,cTitle1")
 
+Private oTempTable1 := Nil
+
 /*
 ‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -935,6 +937,9 @@ If nLastKey == 27
    Return
 Endif
 RptStatus({|lEnd| Relato()},cTit)// Substituido pelo assistente de conversao do AP5 IDE em 05/07/00 ==> RptStatus({|lEnd| Execute(Relato)},cTit)
+
+oTempTable1:Delete()
+
 Return
 
 /*‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹
@@ -996,9 +1001,10 @@ AADD(aFields,{"TR_LOCAL",   "C", TamSx3("RA2_LOCAL")[1],  TamSx3("RA2_LOCAL")[2]
 AADD(aFields,{"TR_SINON",   "C", TamSx3("RA4_SINONI")[1], TamSx3("RA4_SINONI")[2] } )
 AADD(aFields,{"TR_DESCSI",  "C", TamSx3("RA9_DESCR")[1],  TamSx3("RA9_DESCR")[2]  } )
 
-
-dbCreate(cArqDbf,aFields)
-dbUseArea(.T., NIL, cArqDbf, "TRA", .F.)
+oTempTable1 := FWTemporaryTable():New("TRA")
+oTemptable1:SetFields( aFields )
+oTempTable1:Create()
+dbSelectArea("TRA")
 
 If nOrdem == 1 		// Matricula 
 	cIndCond := "TR_FILIAL + TR_CURSO + TR_CALEND + TR_TURMA + TR_MAT"

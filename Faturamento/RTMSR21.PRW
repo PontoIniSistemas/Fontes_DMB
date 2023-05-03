@@ -34,8 +34,6 @@ Local aOrd    := {}
 Private aReturn  := {STR0003,1,STR0004,2, 2, 1, "",1 } //"Zebrado"###"Administracao"
 Private nLastKey := 0
 
-AjustaSX1(cPerg)
-
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica as perguntas                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -197,39 +195,5 @@ Endif
 MS_FLUSH()
 
 RestArea(aAreaAtu)
-
-Return
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Funcao    ³AjustaSX1  ³ Autor ³Richard Anderson    ³ Data ³ 22/11/2006 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descricao ³Inclui Perguntas no SX1                                     ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³RTMSR21                                                     ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function AjustaSX1(cPerg)
-
-SX1->(DbSetOrder(1))
-If Sx1->(dbSeek(cPerg)) 
-	If Alltrim(SX1->X1_PERGUNT)==Alltrim(SX1->X1_PERSPA)
-		While SX1->(!Eof()) .And. Alltrim(SX1->X1_GRUPO)==Alltrim(cPerg)
-			Reclock("SX1",.F.)
-			DBDelete()
-			SX1->(MsUnlock())
-			SX1->(dbSkip())
-		EndDo
-	EndIf
-EndIf
-
-PutSx1( cPerg,"01","No.Nota de ?        ","¿De No.Nota ?       ","No.Nota de ?        ","mv_ch1","C",6,0,0,"G","","DIH","","","mv_par01")
-PutSx1( cPerg,"02","No.Nota Até ?       ","¿A No.Nota  ?       ","No.Nota Até ?       ","mv_ch2","C",6,0,0,"G","","DIH","","","mv_par02")
-PutSx1( cPerg,"03","Data Emissão de ?   ","¿De Fecha Emission ?","Data Emissão de ?   ","mv_ch3","D",8,0,0,"G","",""   ,"","","mv_par03")
-PutSx1( cPerg,"04","Data Emissão Até ?  ","¿A Fecha Emission  ?","Data Emissão Até ?  ","mv_ch4","D",8,0,0,"G","",""   ,"","","mv_par04")
-PutSx1( cPerg,"05","Impressão/Reimpre.? ","¿Impresion/Nuev.Imp.?","Impressão/Reimpre.? ","mv_ch9","N",1,0,0,"C","",""   ,"","","mv_par05","Impressão","Impresion","Impressão","","Reimpressão","Nueva Impresion","Reimpressão")
 
 Return

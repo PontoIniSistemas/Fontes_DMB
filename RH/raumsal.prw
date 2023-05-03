@@ -759,6 +759,8 @@ Local nAuxFor	:= 	1
 Local nFor		:= 0
 Local I			:= 0 
 Local aArea		:=	{}
+Local aContSX5
+Local nX
 
 Private aCod	:=	{}
 
@@ -779,16 +781,14 @@ If !l1Elem
 Endif
 mvPar 	:= MvParam
 
-
-dbSelectArea("SX5")
 cChave:=If(Empty(xFilial('SX5')), Space(2), cFilial)+'41'
+aContSX5 := FWGetSX5("41", cChave)
 
-If DbSeek(cChave)
-	While !Eof() .and. cChave == SX5->X5_FILIAL+SX5->X5_TABELA
-		Aadd(aCod,SX5->X5_CHAVE+ " - "+SX5->X5_DESCRI)
-		MvParDef+=Left(SX5->X5_CHAVE,3)         
-		dbSkip(	)
-	Enddo 
+If Len(aContSX5) > 1
+	For nX := 1 To Len(aContSX5)
+		Aadd(aCod,aContSX5[nX][3]+ " - "+aContSX5[nX][4])
+		MvParDef+=Left(aContSX5[nX][3],3)          
+	Next nX
 Else
 	Help(" ",1,"")	 //Cadastro de Aumentos Nao Existe para a Filial 
 	RestArea(aArea)

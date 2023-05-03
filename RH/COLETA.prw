@@ -90,6 +90,7 @@ Local cPath		:= ""
 Local cArqLoc	:= ""
 Local nPos		:= 0
 Local nBegin	:= 0
+Local aContSX5
     
 // Verifica se existe a Empresa Patrocinadora
 dbSelectArea("RB0")
@@ -318,10 +319,9 @@ For nx:= 1 To nAte
 			cFone		:= RB0->RB0_FONE
 			cEmail		:= RB0->RB0_EMAIL           
 			
-			dbSelectArea("SX5")
-			dbSetOrder(1)
-			If dbSeek(xFilial("SX5")+"RC"+cRegiao)
-				cDescRegiao := Substr(SX5->X5_DESCRI,1,30)
+			aContSX5 := FWGetSX5("RC", xFilial("SX5")+"RC"+cRegiao)
+			If Len(aContSX5) > 0
+				cDescRegiao := Substr(aContSX5[1][4],1,30)
 			EndIf			
 			If cPorte == "P"
 				cDescPorte := STR0008 //"PEQUENO"

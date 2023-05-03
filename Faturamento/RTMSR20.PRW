@@ -97,6 +97,8 @@ Local  aVias        := { 'Primer original para el remitente. Unico valido para r
                        }
 Local  nQtdVia      := Len(aVias)
 
+Local cRetCodUsr := RetCodUsr()
+
 oFont1 := TFont():New("Arial"      ,00,13,,.T.,,,,.T.,.F.)
 oFont2 := TFont():New("Arial"      ,00,08,,.T.,,,,.T.,.F.)
 oFontE := TFont():New("Arial"      ,00,15,,.T.,,,,.T.,.F.)
@@ -170,7 +172,7 @@ While (cAliasDT6)->(!Eof())
 				DTC->(dbSeek(xFilial('DTC')+DT6->(DT6_FILDOC+DT6_DOC+DT6_SERIE)))
 				
 				//-- Simbolo da moeda do documento
-				cSimbMd := GetMv('MV_SIMB'+Str(DT6->DT6_MOEDA,1),,1)
+				cSimbMd := CALLGETMV('MV_SIMB'+Str(DT6->DT6_MOEDA,1),,1)
 				
 				//-- Campo 01: Dados do Remetente
 				aDadCRT := TMSDadCRT('01',DT6->DT6_FILDOC,DT6->DT6_DOC,DT6->DT6_SERIE)
@@ -228,7 +230,7 @@ While (cAliasDT6)->(!Eof())
 				
 				//-- Campo 14: Valor
 				oPrint:Say( 1760, 1830, Space(09)+Transform(DT6->DT6_VALMER,"@E 99999,999.99"), oFontD )
-				oPrint:Say( 1810, 1900, GetMv('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1), oFontD )
+				oPrint:Say( 1810, 1900, CALLGETMV('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1), oFontD )
 				
 				oPrint:Box( 1900, 1120, 2000, 2400 )
 				oPrint:Say( 1910, 1130, "16. Declaración el valor de las mercancias"            , oFont2 )
@@ -240,7 +242,7 @@ While (cAliasDT6)->(!Eof())
 				EndIf
 				DIK->(dbSetOrder(4))
 				DIK->(dbSeek(xFilial('DIK')+DT6->(DT6_FILDOC+DT6_DOC+DT6_SERIE)))
-				cDados += Space(30)+GetMv('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1)+Space(6)+Transform(DIK->DIK_VALMER,"@E 99999,999.99")
+				cDados += Space(30)+CALLGETMV('MV_SIMB'+Str(DTC->DTC_MOENFC,1),,1)+Space(6)+Transform(DIK->DIK_VALMER,"@E 99999,999.99")
 				oPrint:Say( 1940, 1130, cDados, oFontD )
 	
 				//-- Campo 15: Composicao do Frete
@@ -382,7 +384,7 @@ While (cAliasDT6)->(!Eof())
 				oPrint:Say( 3100, 0120, Dtoc(DT6->DT6_DATEMI), oFontD )
 				
 				//-- Campo 24: Nome do Representante
-				oPrint:Say( 3100, 1178, AllTrim(UsrRetName(DT6->DT6_USRGER))+' '+AllTrim(UsrRetName(RetCodUsr()))+' crt: '+DT6->(DT6_FILORI+' '+DT6_FILDES+' '+DT6_DOC), oFontD )
+				oPrint:Say( 3100, 1178, AllTrim(UsrRetName(DT6->DT6_USRGER))+' '+AllTrim(UsrRetName(cRetCodUsr))+' crt: '+DT6->(DT6_FILORI+' '+DT6_FILDES+' '+DT6_DOC), oFontD )
 
 				//-- Via
 				oPrint:Say( 3145, 0020, aVias[nVia], oFontD )
@@ -395,7 +397,7 @@ While (cAliasDT6)->(!Eof())
 			//-- Atualiza campo DT6_FIMP (Flag de Impressao)
 			RecLock("DT6",.F.)
 			DT6->DT6_FIMP   := StrZero(1,Len(DT6->DT6_FIMP))
-			DT6->DT6_USRIMP := RetCodUsr()
+			DT6->DT6_USRIMP := cRetCodUsr
 			MsUnlock()
 			
 			DT6->(dbSkip())
@@ -561,3 +563,20 @@ oPrint:Say( 2960, 1130, "24. Nombre y firma del destinatario o su"              
 oPrint:Say( 2990, 1178, "Nome e assinatura do destinatário ou seu representante", oFont2 )
 
 Return
+
+//-----------------------------------------------------------------------------
+/*/{Protheus.doc} CALLGETMV
+Chama função CALLTYPE()
+@author 	Ponto iNi - Victor Costa
+@since 		03/04/2023
+@version 	P12
+@obs  		
+Projeto 	FrontFlow
+
+Alteracoes Realizadas desde a Estruturacao Inicial 
+Data       Programador     Motivo 
+/*/ 
+//----------------------------------------------------------------------------
+
+Static Function CALLGETMV(cPar1, cPar2, cPar3)
+Return GetMv(cPar1, cPar2, cPar3)

@@ -480,6 +480,7 @@ Local aDados		:= {}
 Local aEmpDados		:= {}
 Local nx			:= 0
 Local cFil			:= ""
+Local aContSX5
 
 // Usadas na funcao CS050Array
 Private aVl1	:= {}
@@ -496,10 +497,10 @@ If dbSeek(xFilial("RB0")+cCodConvid)
 		cNomePorte := STR0011	//"GRANDE"
 	EndIf
 		
-	dbSelectArea("SX5")
-	dbSetOrder(1)
-	If dbSeek(xFilial("SX5")+"RC"+RB0->RB0_REGIAO)	
-		cNomeRegiao := Substr(SX5->X5_DESCRI,1,30)
+	aContSX5 := FWGetSX5("RC", xFilial("SX5")+"RC"+RB0->RB0_REGIAO)
+
+	If Len(aContSX5) > 0
+		cNomeRegiao := Substr(aContSX5[1][4],1,30)
 	EndIf			            
 	cAuxPorte := RB0->RB0_PORTE
 	cAuxRegiao:= RB0->RB0_REGIAO
@@ -826,6 +827,7 @@ Local MvPar		:= ""
 Local MvParDef	:= ""
 Local aAux		:= {}  
 Local cFil		:= ""
+Local cGetMv	:= GETMV(cMoeda)
 
 MvPar	:=&(Alltrim(ReadVar()))		 // Carrega Nome da Variavel do Get em Questao
 MvRet	:=Alltrim(ReadVar())			 // Iguala Nome da Variavel ao Nome variavel de Retorno
@@ -835,7 +837,7 @@ If nQual == 1				// Moeda
 	cTitulo := STR0030	//"Moedas do Sistema"
 	For i:=1 To 5
 		cMoeda := "MV_MOEDA"+Str(i,1)
-		Aadd(aArray,Alltrim(GETMV(cMoeda)))
+		Aadd(aArray,Alltrim(cGetMv))
 		MvParDef:=MvParDef+Str(i,1)
 	Next i
 Else      
@@ -893,12 +895,11 @@ Return .T.
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß/*/
 Static Function FVerRegiao(cRegiao)
 Local aSaveArea := GetArea()
-Local cDesc		:= ""
+Local cDesc			:= ""
+Local aContSx5 	:= FWGetSX5(xFilial("SX5")+"RC"+cRegiao)
 
-dbSelectArea("SX5")
-dbSetOrder(1)
-If dbSeek(xFilial("SX5")+"RC"+cRegiao)
-	cDesc := Substr(SX5->X5_DESCRI,1,30)
+If Len(aContSX5) > 0
+	cDesc := Substr(aContSX5[1][4],1,30)
 EndIf
             
 RestArea(aSaveArea)

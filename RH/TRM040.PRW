@@ -486,8 +486,11 @@ Else  //Relatorio do Centro de custo
 	AADD(aFields,{"TR_HORAS",  "N", TamSx3("RA4_HORAS")[1],  TamSx3("RA4_HORAS")[2]  } )  
 	AADD(aFields,{"TR_DATA",   "D", TamSx3("RA4_DATAIN")[1], TamSx3("RA4_DATAIN")[2]  } )  
 
-	dbCreate(cArqDbf, aFields)
-	dbUseArea(.T., NIL, cArqDbf, "TRA", .F.)
+	oTempTable1 := FWTemporaryTable():New("TRA")
+  oTemptable1:SetFields( aFields )
+  oTempTable1:Create()
+	dbSelectArea("TRA")
+
 	cIndCond := "TR_CC + TR_CURSO"	// Centro de Custo + Curso  
 
 	cArqNtx  := CriaTrab(NIL,.f.)
@@ -807,7 +810,9 @@ SetPrvt("AFIELDS,CINDCOND,CARQNTX,CINICIO,CFIM,CFIL")
 SetPrvt("LRET,AHORAS,AVALOR,ACHORAS,ACVALOR,ATHORAS")
 SetPrvt("ATVALOR,CCURSO,CNOME,CCC,NMES,WCABEC0")
 SetPrvt("WCABEC1,WCABEC2,NTOTAL,DET,NX,CAUX,LIMP")
-SetPrvt("cAcessaRA4,nChar,cCargo,aLogCargo,aLogTitle,lExcLogCargo,cMainTitle,cTitle1") 
+SetPrvt("cAcessaRA4,nChar,cCargo,aLogCargo,aLogTitle,lExcLogCargo,cMainTitle,cTitle1")
+
+Private oTempTable2 := Nil
 
 
 /*
@@ -911,6 +916,8 @@ Endif
 
 RptStatus({|lEnd| Relato()},cTit)
 
+oTempTable2:Delete()
+
 Return
 
 Static Function Relato()
@@ -933,8 +940,10 @@ AADD(aFields,{"TR_CUSTO",  "N", TamSx3("RA4_VALOR")[1],  TamSx3("RA4_VALOR")[2] 
 AADD(aFields,{"TR_HORAS",  "N", TamSx3("RA4_HORAS")[1],  TamSx3("RA4_HORAS")[2]  } )  
 AADD(aFields,{"TR_DATA",   "D", TamSx3("RA4_DATAIN")[1], TamSx3("RA4_DATAIN")[2] } )  
 
-dbCreate(cArqDbf, aFields)
-dbUseArea(.T., NIL, cArqDbf, "TRA", .F.)
+oTempTable2 := FWTemporaryTable():New("TRA")
+oTemptable2:SetFields( aFields )
+oTempTable2:Create()
+dbSelectArea("TRA")
 
 If nOrdem == 1 		// Curso     
 	cIndCond := "TR_CURSO"

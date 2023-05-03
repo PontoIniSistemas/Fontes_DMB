@@ -952,6 +952,8 @@ SetPrvt("NNECESS,CFIL,CINICIO,CFIM,LIMPDET")
 SetPrvt("CRESERVA,DET,DETCURSO,LFIRST") 
 SetPrvt("CARQDBF,AFIELDS,CACESSARA3,NCHAR,CORDEM") 
 
+Private oTempTable1 := Nil
+
 cDesc1  := STR0001 //"Treinamento"
 cDesc2  := STR0002 //"Será impresso de acordo com os parametros solicitados pelo"
 cDesc3  := STR0003 //"usuário."
@@ -1027,6 +1029,9 @@ If nLastKey == 27
 Endif
 
 RptStatus({|lEnd| Relato()},cTit)
+
+oTempTable1:Delete()
+
 Return
 
 /*
@@ -1106,8 +1111,10 @@ AADD(aFields,{"TR_TURMA",  "C", TamSx3("RA3_TURMA")[1],  TamSx3("RA3_TURMA")[2] 
 AADD(aFields,{"TR_DTINI",  "D", TamSx3("RA2_DATAIN")[1],  TamSx3("RA2_DATAIN")[2] } )
 AADD(aFields,{"TR_DTFIM",  "D", TamSx3("RA2_DATAFI")[1],  TamSx3("RA2_DATAFI")[2] } )
 
-dbCreate(cArqDbf,aFields)
-dbUseArea(.T., NIL, cArqDbf, "TRA", .F.)
+oTempTable1 := FWTemporaryTable():New("TRA")
+oTemptable1:SetFields( aFields )
+oTempTable1:Create()
+dbSelectArea("TRA")
 
 If nOrdem == 1		// Matricula 
 	cIndCond := "TR_FILIAL + TR_CURSO + TR_MAT"

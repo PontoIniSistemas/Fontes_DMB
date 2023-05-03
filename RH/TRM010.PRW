@@ -630,6 +630,8 @@ SetPrvt("CGRUPO,CDEPTO,CCARGO,CCC")
 SetPrvt("CACESSARA3")
 SetPrvt("LFALTA")
 
+Private oTempTable := Nil
+
 /*
 ‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -723,6 +725,9 @@ If nLastKey == 27
 Endif
 
 RptStatus({|lEnd| Relato()},cTit)
+
+oTempTable:Delete()
+
 Return
 
 /*
@@ -792,8 +797,11 @@ AADD(aFields,{"TR_NOMED",  "C", TamSx3("QB_DESCRIC")[1], TamSx3("QB_DESCRIC")[2]
 AADD(aFields,{"TR_CARGO",  "C", TamSx3("Q3_CARGO")[1],   TamSx3("Q3_CARGO")[2]   } )
 AADD(aFields,{"TR_NOMEC",  "C", TamSx3("Q3_DESCSUM")[1], TamSx3("Q3_DESCSUM")[2] } )
 
-DbCreate(cArqDbf,aFields)
-DbUseArea(.T.,,cArqDbf,"TRA",.F.)
+oTempTable := FWTemporaryTable():New("TRA")
+oTemptable:SetFields( aFields )
+oTempTable:Create()
+dbSelectArea("TRA")
+
 If nOrdem == 1
 	cIndCond := "TR_CALEND + TR_CURSO + TR_TURMA + TR_FILIAL + TR_NOME + TR_MAT"
 ElseIf nOrdem == 2

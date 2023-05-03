@@ -61,8 +61,6 @@ Private cInd        := ''
 //Fatura         Data Fatura  Valor Fatura Valor IRPF Vl.Comissao Valor ISS Desc. Ret.
 //999999999      99/99/99     9,999,999.99 999,999.99  999,999.99 99,999.99 999,999.99
 
-Rtmsr24SX1(cPerg)
-
 DbSelectArea('DTV')
 DbSetOrder(1)
 
@@ -323,43 +321,3 @@ If mv_par09 == 3
 EndIf	
 
 Return NIL
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Funcao    ³ RTMSR24Sx1³ Autor ³Richard Anderson    ³ Data ³ 26/03/2009 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descricao ³Inclui Perguntas no SX1                                     ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³RTMSR24                                                     ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function RTMSR24Sx1(cPerg)
-
-Local nTamCia := Len(DTV->DTV_CODCIA)
-Local nTamLoj := Len(DTV->DTV_LOJCIA)
-
-SX1->(dbSetOrder(1))
-If SX1->(dbSeek(Padr(cPerg,Len(SX1->X1_GRUPO))+"09")) .And. !("Emitidas" $ SX1->X1_DEF01)
-	SX1->(dbSeek(Padr(cPerg,Len(SX1->X1_GRUPO))+"01"))
-	While SX1->(!Eof()) .And. SX1->X1_GRUPO == Padr(cPerg,Len(SX1->X1_GRUPO))
-		RecLock("SX1",.F.)
-		dbDelete()
-		MsUnLock()
-		SX1->(dbSkip())
-	EndDo
-EndIf			
-
-PutSx1( cPerg, "01","Cia Aerea de?       ","Cia Aérea de?        ","Cia Aérea de?       ","mv_ch1","C",nTamCia,0,0,"G","","FOR","","","mv_par01")
-PutSx1( cPerg, "02","Loja Cia de?        ","Loja Cia de?         ","Loja Cia de?        ","mv_ch2","C",nTamLoj,0,0,"G","",""   ,"","","mv_par02")
-PutSx1( cPerg, "03","Cia Aerea Até?      ","Cia Aérea Até?       ","Cia Aérea Até?      ","mv_ch3","C",nTamCia,0,0,"G","","FOR","","","mv_par03")
-PutSx1( cPerg, "04","Loja Cia Até?       ","Loja Cia Até?        ","Loja Cia Até?       ","mv_ch4","C",nTamLoj,0,0,"G","",""   ,"","","mv_par04")
-PutSx1( cPerg, "05","Data de?            ","Data de?             ","Data de?            ","mv_ch5","D",8      ,0,0,"G","",""   ,"","","mv_par05")
-PutSx1( cPerg, "06","Data Até?           ","Data Até?            ","Data Até?           ","mv_ch6","D",8      ,0,0,"G","",""   ,"","","mv_par06")
-PutSx1( cPerg, "07","Fil.Origem de?      ","Fil.Origem de?       ","Fil.Origem de?      ","mv_ch7","C",2      ,0,0,"G","","DLB","","","mv_par07")
-PutSx1( cPerg, "08","Fil.Origem Até?     ","Fil.Origem Até?      ","Fil.Origem Até?     ","mv_ch8","C",2      ,0,0,"G","","DLB","","","mv_par08")
-PutSX1( cPerg, '09',"Tipo do Relatório?  ","Tipo do Relatório?   ","Tipo do Relatório?  ","mv_ch9","N",1      ,0,1,"C","",""   ,"","","mv_par09","AWB´s Emitidas","AWB´s Emitidas","AWB´s Emitidas",'',"AWB´s não Fat.","AWB´s não Fat.","AWB´s não Fat.","AWB´s faturadas","AWB´s faturadas","AWB´s faturadas")
-
-Return
